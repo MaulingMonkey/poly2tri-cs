@@ -31,16 +31,11 @@
 
 namespace Poly2Tri {
 	public class DTSweepConstraint : TriangulationConstraint {
-		/**
-		 * Give two points in any order. Will always be ordered so
-		 * that q.y > p.y and q.x > p.x if same y value 
-		 * 
-		 * @param p1
-		 * @param p2
-		 */
-		public DTSweepConstraint(TriangulationPoint p1, TriangulationPoint p2)
-			//        throws DuplicatePointException
-		{
+		/// <summary>
+		/// Give two points in any order. Will always be ordered so
+		/// that q.y > p.y and q.x > p.x if same y value 
+		/// </summary>
+		public DTSweepConstraint( TriangulationPoint p1, TriangulationPoint p2 ) {
 			p = p1;
 			q = p2;
 			if (p1.Y > p2.Y) {
@@ -58,18 +53,5 @@ namespace Poly2Tri {
 			}
 			q.addEdge(this);
 		}
-
-		//    public TriangulationPoint intersect( TriangulationPoint a, TriangulationPoint b )
-		//    {
-		//        double pqx,pqy,bax,bay,t;
-		//        
-		//        pqx = p.X-q.X;
-		//        pqy = p.Y-q.Y;
-		//        t = pqy*(a.X-q.X) - pqx*(a.Y-q.Y );
-		//        t /= pqx*(b.Y-a.Y) - pqy*(b.X-a.X);
-		//        bax = t*(b.X-a.X) + a.X;
-		//        bay = t*(b.Y-a.Y) + a.Y;
-		//        return new TriangulationPoint( bax, bay );
-		//    }
 	}
 }
