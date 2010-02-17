@@ -35,7 +35,7 @@ namespace Poly2Tri {
 
 		public static void triangulate(PolygonSet ps) {
 			TriangulationContext tcx = createContext(_defaultAlgorithm);
-			foreach (Polygon p in ps.getPolygons()) {
+			foreach (Polygon p in ps.Polygons) {
 				tcx.prepareTriangulation(p);
 				triangulate(tcx);
 				tcx.clear();

@@ -144,7 +144,7 @@ namespace Poly2Tri {
 		 */
 		public void triangulate(PolygonSet ps) {
 			_triangulations.clear();
-			_triangulations.addAll(ps.getPolygons());
+			_triangulations.addAll(ps.Polygons);
 			start();
 		}
 
