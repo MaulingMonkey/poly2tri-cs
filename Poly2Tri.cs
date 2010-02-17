@@ -30,31 +30,31 @@
  */
 
 namespace Poly2Tri {
-	public class Poly2Tri {
+	public static class Poly2Tri {
 		private static TriangulationAlgorithm _defaultAlgorithm = TriangulationAlgorithm.DTSweep;
 
-		public static void triangulate(PolygonSet ps) {
-			TriangulationContext tcx = createContext(_defaultAlgorithm);
+		public static void Triangulate(PolygonSet ps) {
+			TriangulationContext tcx = CreateContext(_defaultAlgorithm);
 			foreach (Polygon p in ps.Polygons) {
 				tcx.prepareTriangulation(p);
-				triangulate(tcx);
+				Triangulate(tcx);
 				tcx.clear();
 			}
 		}
 
-		public static void triangulate(Polygon p) {
-			triangulate(_defaultAlgorithm, p);
+		public static void Triangulate(Polygon p) {
+			Triangulate(_defaultAlgorithm, p);
 		}
 
-		public static void triangulate(ConstrainedPointSet cps) {
-			triangulate(_defaultAlgorithm, cps);
+		public static void Triangulate(ConstrainedPointSet cps) {
+			Triangulate(_defaultAlgorithm, cps);
 		}
 
-		public static void triangulate(PointSet ps) {
-			triangulate(_defaultAlgorithm, ps);
+		public static void Triangulate(PointSet ps) {
+			Triangulate(_defaultAlgorithm, ps);
 		}
 
-		public static TriangulationContext createContext(TriangulationAlgorithm algorithm) {
+		public static TriangulationContext CreateContext(TriangulationAlgorithm algorithm) {
 			switch (algorithm) {
 			case TriangulationAlgorithm.DTSweep:
 			default:
@@ -62,18 +62,17 @@ namespace Poly2Tri {
 			}
 		}
 
-		public static void triangulate(TriangulationAlgorithm algorithm,
-										Triangulatable t) {
+		public static void Triangulate(TriangulationAlgorithm algorithm, Triangulatable t) {
 			TriangulationContext tcx;
 
 			//        long time = System.nanoTime();
-			tcx = createContext(algorithm);
+			tcx = CreateContext(algorithm);
 			tcx.prepareTriangulation(t);
-			triangulate(tcx);
+			Triangulate(tcx);
 			//        logger.info( "Triangulation of {} points [{}ms]", tcx.getPoints().size(), ( System.nanoTime() - time ) / 1e6 );
 		}
 
-		public static void triangulate(TriangulationContext tcx) {
+		public static void Triangulate(TriangulationContext tcx) {
 			switch (tcx.algorithm()) {
 			case TriangulationAlgorithm.DTSweep:
 			default:
@@ -82,10 +81,12 @@ namespace Poly2Tri {
 			}
 		}
 
-		/**
-		 * Will do a warmup run to let the JVM optimize the triangulation code 
-		 */
-		public static void warmup() {
+
+		/// <summary>
+		/// Will do a warmup run to let the JVM optimize the triangulation code -- or would if this were Java --MM
+		/// </summary>
+		public static void Warmup() {
+#if false
 			/*
 			 * After a method is run 10000 times, the Hotspot compiler will compile
 			 * it into native code. Periodically, the Hotspot compiler may recompile
@@ -95,6 +96,7 @@ namespace Poly2Tri {
 			Polygon poly = PolygonGenerator.RandomCircleSweep2(50, 50000);
 			TriangulationProcess process = new TriangulationProcess();
 			process.triangulate(poly);
+#endif
 		}
 	}
 }

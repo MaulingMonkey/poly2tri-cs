@@ -7,7 +7,7 @@ namespace Poly2Tri {
 		public static List<TriangulationPoint> uniformDistribution(int n, double scale) {
 			ArrayList<TriangulationPoint> points = new ArrayList<TriangulationPoint>();
 			for (int i = 0; i < n; i++) {
-				points.add(new TPoint(scale * (0.5 - RNG.NextDouble()), scale * (0.5 - RNG.NextDouble())));
+				points.add(new TriangulationPoint(scale * (0.5 - RNG.NextDouble()), scale * (0.5 - RNG.NextDouble())));
 			}
 			return points;
 		}
@@ -21,7 +21,7 @@ namespace Poly2Tri {
 			for (int i = 0; i < n + 1; i++) {
 				x = halfScale - i * size;
 				for (int j = 0; j < n + 1; j++) {
-					points.add(new TPoint(x, halfScale - j * size));
+					points.add(new TriangulationPoint(x, halfScale - j * size));
 				}
 			}
 			return points;

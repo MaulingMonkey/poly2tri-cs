@@ -43,14 +43,14 @@ namespace Poly2Tri {
 		{
 			p = p1;
 			q = p2;
-			if (p1.getY() > p2.getY()) {
+			if (p1.Y > p2.Y) {
 				q = p1;
 				p = p2;
-			} else if (p1.getY() == p2.getY()) {
-				if (p1.getX() > p2.getX()) {
+			} else if (p1.Y == p2.Y) {
+				if (p1.X > p2.X) {
 					q = p1;
 					p = p2;
-				} else if (p1.getX() == p2.getX()) {
+				} else if (p1.X == p2.X) {
 					//                logger.info( "Failed to create constraint {}={}", p1, p2 );
 					//                throw new DuplicatePointException( p1 + "=" + p2 );
 					//                return;
@@ -59,17 +59,17 @@ namespace Poly2Tri {
 			q.addEdge(this);
 		}
 
-		//    public TPoint intersect( TPoint a, TPoint b )
+		//    public TriangulationPoint intersect( TriangulationPoint a, TriangulationPoint b )
 		//    {
 		//        double pqx,pqy,bax,bay,t;
 		//        
-		//        pqx = p.getX()-q.getX();
-		//        pqy = p.getY()-q.getY();
-		//        t = pqy*(a.getX()-q.getX()) - pqx*(a.getY()-q.getY() );
-		//        t /= pqx*(b.getY()-a.getY()) - pqy*(b.getX()-a.getX());
-		//        bax = t*(b.getX()-a.getX()) + a.getX();
-		//        bay = t*(b.getY()-a.getY()) + a.getY();
-		//        return new TPoint( bax, bay );
+		//        pqx = p.X-q.X;
+		//        pqy = p.Y-q.Y;
+		//        t = pqy*(a.X-q.X) - pqx*(a.Y-q.Y );
+		//        t /= pqx*(b.Y-a.Y) - pqy*(b.X-a.X);
+		//        bax = t*(b.X-a.X) + a.X;
+		//        bay = t*(b.Y-a.Y) + a.Y;
+		//        return new TriangulationPoint( bax, bay );
 		//    }
 	}
 }

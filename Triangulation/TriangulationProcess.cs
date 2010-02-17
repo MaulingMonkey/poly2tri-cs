@@ -101,7 +101,7 @@ namespace Poly2Tri {
 
 		public TriangulationProcess(TriangulationAlgorithm algorithm) {
 			_algorithm = algorithm;
-			_tcx = Poly2Tri.createContext(algorithm);
+			_tcx = Poly2Tri.CreateContext(algorithm);
 		}
 
 		/**
@@ -192,7 +192,7 @@ namespace Poly2Tri {
 					_tcx.clear();
 					_tcx.prepareTriangulation(t);
 					_pointCount += _tcx._points.size();
-					Poly2Tri.triangulate(_tcx);
+					Poly2Tri.Triangulate(_tcx);
 				}
 				//_triangulationTime = ( System.nanoTime() - time ) / 1e6;
 				_triangulationTime = (DateTime.Now - time).TotalMilliseconds;

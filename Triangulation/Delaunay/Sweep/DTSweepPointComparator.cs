@@ -6,14 +6,14 @@ using System.Text;
 namespace Poly2Tri {
 	public class DTSweepPointComparator : IComparer<TriangulationPoint> {
 		public int Compare(TriangulationPoint p1, TriangulationPoint p2) {
-			if (p1.getY() < p2.getY()) {
+			if (p1.Y < p2.Y) {
 				return -1;
-			} else if (p1.getY() > p2.getY()) {
+			} else if (p1.Y > p2.Y) {
 				return 1;
 			} else {
-				if (p1.getX() < p2.getX()) {
+				if (p1.X < p2.X) {
 					return -1;
-				} else if (p1.getX() > p2.getX()) {
+				} else if (p1.X > p2.X) {
 					return 1;
 				} else {
 					return 0;

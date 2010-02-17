@@ -25,7 +25,7 @@ namespace SwfTest {
 			}
 
 			Monkey = new Polygon(new ArrayList<PolygonPoint>(monkeydata.Select(p => new PolygonPoint(p.X, p.Y))));
-			Poly2Tri.Poly2Tri.triangulate(Monkey);
+			Poly2Tri.Poly2Tri.Triangulate(Monkey);
 		}
 
 		protected override void OnPaint(PaintEventArgs e) {
@@ -34,10 +34,10 @@ namespace SwfTest {
 			fx.ScaleTransform(1, -1);
 			foreach ( var tri in Monkey.Triangles ) {
 				fx.DrawLines(Pens.Green, new PointF[]
-					{ new PointF(5*tri.points[0].getXf(),5*tri.points[0].getYf())
-					, new PointF(5*tri.points[1].getXf(),5*tri.points[1].getYf())
-					, new PointF(5*tri.points[2].getXf(),5*tri.points[2].getYf())
-					, new PointF(5*tri.points[0].getXf(),5*tri.points[0].getYf())
+					{ new PointF(5*tri.points[0].Xf,5*tri.points[0].Yf)
+					, new PointF(5*tri.points[1].Xf,5*tri.points[1].Yf)
+					, new PointF(5*tri.points[2].Xf,5*tri.points[2].Yf)
+					, new PointF(5*tri.points[0].Xf,5*tri.points[0].Yf)
 					});
 			}
 			base.OnPaint(e);

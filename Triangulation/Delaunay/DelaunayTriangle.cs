@@ -150,18 +150,18 @@ namespace Poly2Tri {
 		}
 
 		// Fast point in triangle test
-		//    public boolean pointIn( TPoint point )
+		//    public boolean pointIn( TriangulationPoint point )
 		//    {
-		//        double ijx = points[1].getX() - points[0].getX();
-		//        double ijy = points[1].getY() - points[0].getY();
-		//        double abx = point.getX() - points[0].getX();
-		//        double aby = point.getY() - points[0].getY();
+		//        double ijx = points[1].X - points[0].X;
+		//        double ijy = points[1].Y - points[0].Y;
+		//        double abx = point.X - points[0].X;
+		//        double aby = point.Y - points[0].Y;
 		//        double pab = abx*ijy - aby*ijx;
 		//
-		//        double jkx = points[2].getX() - points[1].getX();
-		//        double jky = points[2].getY() - points[1].getY();
-		//        double bcx = point.getX() - points[1].getX();
-		//        double bcy = point.getY() - points[1].getY();
+		//        double jkx = points[2].X - points[1].X;
+		//        double jky = points[2].Y - points[1].Y;
+		//        double bcx = point.X - points[1].X;
+		//        double bcy = point.Y - points[1].Y;
 		//        double pbc = bcx*jky - bcy*jkx;
 		//        boolean sameSign = Math.signum( pab ) == Math.signum( pbc );
 		//        if( !sameSign )
@@ -169,10 +169,10 @@ namespace Poly2Tri {
 		//            return false;
 		//        }
 		//
-		//        double kix = points[0].getX() - points[2].getX();
-		//        double kiy = points[0].getY() - points[2].getY();
-		//        double cax = point.getX() - points[2].getX();
-		//        double cay = point.getY() - points[2].getY();
+		//        double kix = points[0].X - points[2].X;
+		//        double kiy = points[0].Y - points[2].Y;
+		//        double cax = point.X - points[2].X;
+		//        double cay = point.Y - points[2].Y;
 		//        double pca = cax*kiy - cay*kix;
 		//        sameSign = Math.signum( pab ) == Math.signum( pca );
 		//        if( !sameSign )
@@ -357,24 +357,24 @@ namespace Poly2Tri {
 
 		public double area() {
 
-			double b = points[0].getX() - points[1].getX();
-			double h = points[2].getY() - points[1].getY();
+			double b = points[0].X - points[1].X;
+			double h = points[2].Y - points[1].Y;
 
 			return Math.Abs((b * h * 0.5f));
 		}
 
-		public TPoint centroid() {
-			double cx = (points[0].getX() + points[1].getX() + points[2].getX()) / 3f;
-			double cy = (points[0].getY() + points[1].getY() + points[2].getY()) / 3f;
-			return new TPoint(cx, cy);
+		public TriangulationPoint centroid() {
+			double cx = (points[0].X + points[1].X + points[2].X) / 3f;
+			double cy = (points[0].Y + points[1].Y + points[2].Y) / 3f;
+			return new TriangulationPoint(cx, cy);
 		}
 
 		//    public boolean thin()
 		//    {
-		//        TPoint a1 = (TPoint)points[1].subtract( points[0], null );
-		//        TPoint b1 = (TPoint)points[2].subtract( points[0], null );
-		//        TPoint a2 = (TPoint)points[0].subtract( points[1], null );
-		//        TPoint b2 = (TPoint)points[2].subtract( points[1], null );
+		//        TriangulationPoint a1 = (TriangulationPoint)points[1].subtract( points[0], null );
+		//        TriangulationPoint b1 = (TriangulationPoint)points[2].subtract( points[0], null );
+		//        TriangulationPoint a2 = (TriangulationPoint)points[0].subtract( points[1], null );
+		//        TriangulationPoint b2 = (TriangulationPoint)points[2].subtract( points[1], null );
 		//        double angle1 = Math.abs( Math.atan2( a1.cross( b1 ), a1.dot( b1 ) ) );
 		//        double angle2 = Math.abs( Math.atan2( a2.cross( b2 ), a2.dot( b2 ) ) );
 		//        double angle3 = Math.PI - angle1 - angle2;
@@ -387,14 +387,14 @@ namespace Poly2Tri {
 		// Compute barycentric coordinates (u, v, w) for
 		// point p with respect to triangle
 		// From "Real-Time Collision Detection" by Christer Ericson
-		//    public double[] barycentric( TPoint p )
+		//    public double[] barycentric( TriangulationPoint p )
 		//    {
-		//        double v0x = points[1].getX() - points[0].getX();
-		//        double v0y = points[1].getY() - points[0].getY();
-		//        double v1x = points[2].getX() - points[0].getX();
-		//        double v1y = points[2].getY() - points[0].getY();
-		//        double v2x = p.getX() - points[0].getX();
-		//        double v2y = p.getY() - points[0].getY();
+		//        double v0x = points[1].X - points[0].X;
+		//        double v0y = points[1].Y - points[0].Y;
+		//        double v1x = points[2].X - points[0].X;
+		//        double v1y = points[2].Y - points[0].Y;
+		//        double v2x = p.X - points[0].X;
+		//        double v2y = p.Y - points[0].Y;
 		//        double d00 = v0x*v0x + v0y*v0y;
 		//        double d01 = v0x*v1x + v0y*v1y;
 		//        double d11 = v1x*v1x + v1y*v1y;

@@ -25,8 +25,8 @@ public class DTSweepDebugContext : TriangulationDebugContext
         return true;
     }
 
-    //  private Tuple2<TPoint,Double> m_circumCircle = new Tuple2<TPoint,Double>( new TPoint(), new Double(0) );
-//  public Tuple2<TPoint,Double> getCircumCircle() { return m_circumCircle; }
+    //  private Tuple2<TriangulationPoint,Double> m_circumCircle = new Tuple2<TriangulationPoint,Double>( new TriangulationPoint(), new Double(0) );
+//  public Tuple2<TriangulationPoint,Double> getCircumCircle() { return m_circumCircle; }
     public DelaunayTriangle getPrimaryTriangle()
     {
         return _primaryTriangle;
@@ -90,13 +90,13 @@ public class DTSweepDebugContext : TriangulationDebugContext
         _activeConstraint = null;   
     }
         
-//  public void setWorkingCircumCircle( TPoint point, TPoint point2, TPoint point3 )
+//  public void setWorkingCircumCircle( TriangulationPoint point, TriangulationPoint point2, TriangulationPoint point3 )
 //  {
 //          double dx,dy;
 //          
 //          CircleXY.circumCenter( point, point2, point3, m_circumCircle.a );
-//          dx = m_circumCircle.a.getX()-point.getX();
-//          dy = m_circumCircle.a.getY()-point.getY();
+//          dx = m_circumCircle.a.X-point.X;
+//          dy = m_circumCircle.a.Y-point.Y;
 //          m_circumCircle.b = Double.valueOf( Math.sqrt( dx*dx + dy*dy ) );
 //          
 //  }

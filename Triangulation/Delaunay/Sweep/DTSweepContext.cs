@@ -194,25 +194,25 @@ namespace Poly2Tri {
         double xmax, xmin;
         double ymax, ymin;
 
-        xmax = xmin = _points.get(0).getX();
-        ymax = ymin = _points.get(0).getY();
+        xmax = xmin = _points.get(0).X;
+        ymax = ymin = _points.get(0).Y;
         // Calculate bounds. Should be combined with the sorting
         foreach ( TriangulationPoint p in _points )
         {
-            if( p.getX() > xmax )
-                xmax = p.getX();
-            if( p.getX() < xmin )
-                xmin = p.getX();
-            if( p.getY() > ymax )
-                ymax = p.getY();
-            if( p.getY() < ymin )
-                ymin = p.getY();
+            if( p.X > xmax )
+                xmax = p.X;
+            if( p.X < xmin )
+                xmin = p.X;
+            if( p.Y > ymax )
+                ymax = p.Y;
+            if( p.Y < ymin )
+                ymin = p.Y;
         }
 
         double deltaX = ALPHA * ( xmax - xmin );
         double deltaY = ALPHA * ( ymax - ymin );
-        TPoint p1 = new TPoint( xmax + deltaX, ymin - deltaY );
-        TPoint p2 = new TPoint( xmin - deltaX, ymin - deltaY );
+        TriangulationPoint p1 = new TriangulationPoint( xmax + deltaX, ymin - deltaY );
+        TriangulationPoint p2 = new TriangulationPoint( xmin - deltaX, ymin - deltaY );
 
         setHead( p1 );
         setTail( p2 );

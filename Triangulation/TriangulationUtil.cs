@@ -44,32 +44,32 @@ public class TriangulationUtil
     public static double    EPSILON = 1e-12;
 
     // Returns triangle circumcircle point and radius
-//    public static Tuple2<TPoint, Double> circumCircle( TPoint a, TPoint b, TPoint c )
+//    public static Tuple2<TriangulationPoint, Double> circumCircle( TriangulationPoint a, TriangulationPoint b, TriangulationPoint c )
 //    {
 //        double A = det( a, b, c );
 //        double C = detC( a, b, c );
 //
-//        double sa = a.getX() * a.getX() + a.getY() * a.getY();
-//        double sb = b.getX() * b.getX() + b.getY() * b.getY();
-//        double sc = c.getX() * c.getX() + c.getY() * c.getY();
+//        double sa = a.X * a.X + a.Y * a.Y;
+//        double sb = b.X * b.X + b.Y * b.Y;
+//        double sc = c.X * c.X + c.Y * c.Y;
 //
-//        TPoint bx1 = new TPoint( sa, a.getY() );
-//        TPoint bx2 = new TPoint( sb, b.getY() );
-//        TPoint bx3 = new TPoint( sc, c.getY() );
+//        TriangulationPoint bx1 = new TriangulationPoint( sa, a.Y );
+//        TriangulationPoint bx2 = new TriangulationPoint( sb, b.Y );
+//        TriangulationPoint bx3 = new TriangulationPoint( sc, c.Y );
 //        double bx = det( bx1, bx2, bx3 );
 //
-//        TPoint by1 = new TPoint( sa, a.getX() );
-//        TPoint by2 = new TPoint( sb, b.getX() );
-//        TPoint by3 = new TPoint( sc, c.getX() );
+//        TriangulationPoint by1 = new TriangulationPoint( sa, a.X );
+//        TriangulationPoint by2 = new TriangulationPoint( sb, b.X );
+//        TriangulationPoint by3 = new TriangulationPoint( sc, c.X );
 //        double by = det( by1, by2, by3 );
 //
 //        double x = bx / ( 2 * A );
 //        double y = by / ( 2 * A );
 //
-//        TPoint center = new TPoint( x, y );
+//        TriangulationPoint center = new TriangulationPoint( x, y );
 //        double radius = Math.sqrt( bx * bx + by * by - 4 * A * C ) / ( 2 * Math.abs( A ) );
 //
-//        return new Tuple2<TPoint, Double>( center, radius );
+//        return new Tuple2<TriangulationPoint, Double>( center, radius );
 //    }
 
     /**
@@ -101,12 +101,12 @@ public class TriangulationUtil
                                          TriangulationPoint pc, 
                                          TriangulationPoint pd )
     {
-        double pdx = pd.getX();
-        double pdy = pd.getY();
-        double adx = pa.getX() - pdx;
-        double ady = pa.getY() - pdy;        
-        double bdx = pb.getX() - pdx;
-        double bdy = pb.getY() - pdy;
+        double pdx = pd.X;
+        double pdy = pd.Y;
+        double adx = pa.X - pdx;
+        double ady = pa.Y - pdy;        
+        double bdx = pb.X - pdx;
+        double bdy = pb.Y - pdy;
 
         double adxbdy = adx * bdy;
         double bdxady = bdx * ady;
@@ -117,8 +117,8 @@ public class TriangulationUtil
             return false;
         }
 
-        double cdx = pc.getX() - pdx;
-        double cdy = pc.getY() - pdy;
+        double cdx = pc.X - pdx;
+        double cdy = pc.Y - pdy;
 
         double cdxady = cdx * ady;
         double adxcdy = adx * cdy;
@@ -154,12 +154,12 @@ public class TriangulationUtil
                                       TriangulationPoint pc, 
                                       TriangulationPoint pd )
     {
-        double pdx = pd.getX();
-        double pdy = pd.getY();
-        double adx = pa.getX() - pdx;
-        double ady = pa.getY() - pdy;        
-        double bdx = pb.getX() - pdx;
-        double bdy = pb.getY() - pdy;
+        double pdx = pd.X;
+        double pdy = pd.Y;
+        double adx = pa.X - pdx;
+        double ady = pa.Y - pdy;        
+        double bdx = pb.X - pdx;
+        double bdy = pb.Y - pdy;
 
         double adxbdy = adx * bdy;
         double bdxady = bdx * ady;
@@ -170,8 +170,8 @@ public class TriangulationUtil
             return false;
         }
 
-        double cdx = pc.getX() - pdx;
-        double cdy = pc.getY() - pdy;
+        double cdx = pc.X - pdx;
+        double cdy = pc.Y - pdy;
 
         double cdxady = cdx * ady;
         double adxcdy = adx * cdy;
@@ -198,8 +198,8 @@ public class TriangulationUtil
                                         TriangulationPoint pb, 
                                         TriangulationPoint pc )
     {
-        double detleft = ( pa.getX() - pc.getX() ) * ( pb.getY() - pc.getY() );
-        double detright = ( pa.getY() - pc.getY() ) * ( pb.getX() - pc.getX() );
+        double detleft = ( pa.X - pc.X ) * ( pb.Y - pc.Y );
+        double detright = ( pa.Y - pc.Y ) * ( pb.X - pc.X );
         double val = detleft - detright;
         if( val > -EPSILON && val < EPSILON )
         {

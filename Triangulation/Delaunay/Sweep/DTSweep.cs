@@ -201,7 +201,7 @@ namespace Poly2Tri {
 
 			// Only need to check +epsilon since point never have smaller 
 			// x value than node due to how we fetch nodes from the front
-			if (point.getX() <= node.Point.getX() + TriangulationUtil.EPSILON) Fill(tcx, node);
+			if (point.X <= node.Point.X + TriangulationUtil.EPSILON) Fill(tcx, node);
 
 			tcx.addNode(newNode);
 
@@ -238,7 +238,7 @@ namespace Poly2Tri {
 		private static void EdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			try {
 				tcx.edgeEvent.constrainedEdge = edge;
-				tcx.edgeEvent.right = edge.p.getX() > edge.q.getX();
+				tcx.edgeEvent.right = edge.p.X > edge.q.X;
 
 				if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setPrimaryTriangle(node.Triangle); }
 
@@ -299,7 +299,7 @@ namespace Poly2Tri {
 		private static void FillRightBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			if (tcx.isDebugEnabled()) tcx.getDebugContextAsDT().setActiveNode(node);
 
-			if (node.Point.getX() < edge.p.getX()) { // needed?
+			if (node.Point.X < edge.p.X) { // needed?
 				if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 					// Concave 
 					FillRightConcaveEdgeEvent(tcx, edge, node);
@@ -314,7 +314,7 @@ namespace Poly2Tri {
 		}
 
 		private static void FillRightAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			while (node.Next.Point.getX() < edge.p.getX()) {
+			while (node.Next.Point.X < edge.p.X) {
 				if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setActiveNode(node); }
 				// Check if next node is below the edge
 				Orientation o1 = TriangulationUtil.orient2d(edge.q, node.Next.Point, edge.p);
@@ -362,7 +362,7 @@ namespace Poly2Tri {
 		private static void FillLeftBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			if (tcx.isDebugEnabled()) tcx.getDebugContextAsDT().setActiveNode(node);
 
-			if (node.Point.getX() > edge.p.getX()) {
+			if (node.Point.X > edge.p.X) {
 				if (TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
 					// Concave 
 					FillLeftConcaveEdgeEvent(tcx, edge, node);
@@ -377,7 +377,7 @@ namespace Poly2Tri {
 		}
 
 		private static void FillLeftAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			while (node.Prev.Point.getX() > edge.p.getX()) {
+			while (node.Prev.Point.X > edge.p.X) {
 				if (tcx.isDebugEnabled()) tcx.getDebugContextAsDT().setActiveNode(node);
 				// Check if next node is below the edge
 				Orientation o1 = TriangulationUtil.orient2d(edge.q, node.Prev.Point, edge.p);
@@ -659,17 +659,17 @@ namespace Poly2Tri {
 
 			// Find the bottom and right node
 			tcx.basin.bottomNode = tcx.basin.leftNode;
-			while (tcx.basin.bottomNode.HasNext && tcx.basin.bottomNode.Point.getY() >= tcx.basin.bottomNode.Next.Point.getY()) tcx.basin.bottomNode = tcx.basin.bottomNode.Next;
+			while (tcx.basin.bottomNode.HasNext && tcx.basin.bottomNode.Point.Y >= tcx.basin.bottomNode.Next.Point.Y) tcx.basin.bottomNode = tcx.basin.bottomNode.Next;
 
 			if (tcx.basin.bottomNode == tcx.basin.leftNode) return; // No valid basin
 
 			tcx.basin.rightNode = tcx.basin.bottomNode;
-			while (tcx.basin.rightNode.HasNext && tcx.basin.rightNode.Point.getY() < tcx.basin.rightNode.Next.Point.getY()) tcx.basin.rightNode = tcx.basin.rightNode.Next;
+			while (tcx.basin.rightNode.HasNext && tcx.basin.rightNode.Point.Y < tcx.basin.rightNode.Next.Point.Y) tcx.basin.rightNode = tcx.basin.rightNode.Next;
 
 			if (tcx.basin.rightNode == tcx.basin.bottomNode) return; // No valid basins
 
-			tcx.basin.width = tcx.basin.rightNode.Point.getX() - tcx.basin.leftNode.Point.getX();
-			tcx.basin.leftHighest = tcx.basin.leftNode.Point.getY() > tcx.basin.rightNode.Point.getY();
+			tcx.basin.width = tcx.basin.rightNode.Point.X - tcx.basin.leftNode.Point.X;
+			tcx.basin.leftHighest = tcx.basin.leftNode.Point.Y > tcx.basin.rightNode.Point.Y;
 
 			FillBasinReq(tcx, tcx.basin.bottomNode);
 		}
@@ -693,7 +693,7 @@ namespace Poly2Tri {
 				node = node.Prev;
 			} else {
 				// Continue with the neighbor node with lowest Y value
-				if (node.Prev.Point.getY() < node.Next.Point.getY()) {
+				if (node.Prev.Point.Y < node.Next.Point.Y) {
 					node = node.Prev;
 				} else {
 					node = node.Next;
@@ -706,9 +706,9 @@ namespace Poly2Tri {
 			double height;
 
 			if (tcx.basin.leftHighest) {
-				height = tcx.basin.leftNode.Point.getY() - node.Point.getY();
+				height = tcx.basin.leftNode.Point.Y - node.Point.Y;
 			} else {
-				height = tcx.basin.rightNode.Point.getY() - node.Point.getY();
+				height = tcx.basin.rightNode.Point.Y - node.Point.Y;
 			}
 			if (tcx.basin.width > height) {
 				return true;
@@ -732,12 +732,12 @@ namespace Poly2Tri {
 			 * Where x = ax*bx + ay*by
 			 *       y = ax*by - ay*bx
 			 */
-			double px = node.Point.getX();
-			double py = node.Point.getY();
-			double ax = node.Next.Point.getX() - px;
-			double ay = node.Next.Point.getY() - py;
-			double bx = node.Prev.Point.getX() - px;
-			double by = node.Prev.Point.getY() - py;
+			double px = node.Point.X;
+			double py = node.Point.Y;
+			double ax = node.Next.Point.X - px;
+			double ay = node.Next.Point.Y - py;
+			double bx = node.Prev.Point.X - px;
+			double by = node.Prev.Point.Y - py;
 			return Math.Atan2(ax * by - ay * bx, ax * bx + ay * by);
 		}
 
@@ -745,8 +745,8 @@ namespace Poly2Tri {
 		/// The basin angle is decided against the horizontal line [1,0]
 		/// </summary>
 		private static double BasinAngle( AdvancingFrontNode node ) {
-			double ax = node.Point.getX() - node.Next.Next.Point.getX();
-			double ay = node.Point.getY() - node.Next.Next.Point.getY();
+			double ax = node.Point.X - node.Next.Next.Point.X;
+			double ay = node.Point.Y - node.Next.Next.Point.Y;
 			return Math.Atan2(ay, ax);
 		}
 

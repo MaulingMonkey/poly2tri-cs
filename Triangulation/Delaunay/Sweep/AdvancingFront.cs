@@ -61,10 +61,10 @@ namespace Poly2Tri {
 			StringBuilder sb = new StringBuilder();
 			AdvancingFrontNode node = Head;
 			while (node != Tail) {
-				sb.Append(node.Point.getX()).Append("->");
+				sb.Append(node.Point.X).Append("->");
 				node = node.Next;
 			}
-			sb.Append(Tail.Point.getX());
+			sb.Append(Tail.Point.X);
 			return sb.ToString();
 		}
 
@@ -80,7 +80,7 @@ namespace Poly2Tri {
 		/// We use a balancing tree to locate a node smaller or equal to given key value (in theory)
 		/// </summary>
 		public AdvancingFrontNode LocateNode( TriangulationPoint point ) {
-			return LocateNode(point.getX());
+			return LocateNode(point.X);
 		}
 
 		private AdvancingFrontNode LocateNode( double x ) {
@@ -105,9 +105,9 @@ namespace Poly2Tri {
 		/// This implementation will use simple node traversal algorithm to find a point on the front
 		/// </summary>
 		public AdvancingFrontNode LocatePoint( TriangulationPoint point ) {
-			double px = point.getX();
+			double px = point.X;
 			AdvancingFrontNode node = FindSearchNode(px);
-			double nx = node.Point.getX();
+			double nx = node.Point.X;
 
 			if (px == nx) {
 				if (point != node.Point) {

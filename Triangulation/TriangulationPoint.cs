@@ -30,23 +30,19 @@
  */
 
 namespace Poly2Tri {
-	public abstract class TriangulationPoint {
+	public class TriangulationPoint {
 		// List of edges this point constitutes an upper ending point (CDT)
 		private ArrayList<DTSweepConstraint> edges;
 
+		public TriangulationPoint( double x, double y ) { X=x; Y=y; }
+
 		public override string ToString() {
-			return "[" + getX() + "," + getY() + "]";
+			return "[" + X + "," + Y + "]";
 		}
 
-		public abstract double getX();
-		public abstract double getY();
-		public abstract double getZ();
-
-		public abstract float getXf();
-		public abstract float getYf();
-		public abstract float getZf();
-
-		public abstract void set(double x, double y, double z);
+		public double X,Y;
+		public float Xf { get { return (float)X; } set { X=value; } }
+		public float Yf { get { return (float)Y; } set { Y=value; } }
 
 		public ArrayList<DTSweepConstraint> getEdges() {
 			return edges;
@@ -79,7 +75,7 @@ namespace Poly2Tri {
 		//public override bool Equals(object obj) {
 		//    if (obj is TriangulationPoint) {
 		//        TriangulationPoint p = (TriangulationPoint)obj;
-		//        return getX() == p.getX() && getY() == p.getY();
+		//        return getX() == p.X && getY() == p.Y;
 		//    }
 		//    return base.Equals(obj);
 		//}
