@@ -52,9 +52,11 @@
     <Compile Include="Triangulation\Delaunay\Sweep\AdvancingFront.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\AdvancingFrontNode.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\DTSweep.cs" />
+    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepBasin.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\DTSweepConstraint.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\DTSweepContext.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs" />
+    <Compile Include="Triangulation\Delaunay\Sweep\DTSweepEdgeEvent.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\DTSweepPointComparator.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\PointOnEdgeException.cs" />
     <Compile Include="Triangulation\Orientation.cs" />

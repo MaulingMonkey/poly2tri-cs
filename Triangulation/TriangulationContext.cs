@@ -35,7 +35,6 @@ using System.Collections.Generic;
 namespace Poly2Tri {
 	public abstract class TriangulationContext {
 		protected TriangulationDebugContext _debug;
-		protected boolean _debugEnabled = false;
 
 		protected ArrayList<DelaunayTriangle> _triList = new ArrayList<DelaunayTriangle>();
 
@@ -52,15 +51,15 @@ namespace Poly2Tri {
 			_stepCount++;
 		}
 
-		public abstract TriangulationAlgorithm algorithm();
+		public abstract TriangulationAlgorithm Algorithm();
 
-		public virtual void prepareTriangulation(Triangulatable t) {
+		public virtual void PrepareTriangulation(Triangulatable t) {
 			_triUnit = t;
 			_triangulationMode = t.TriangulationMode;
 			t.Prepare(this);
 		}
 
-		public abstract TriangulationConstraint newConstraint(TriangulationPoint a, TriangulationPoint b);
+		public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
 
 		public void addToList(DelaunayTriangle triangle) {
 			_triList.add(triangle);
@@ -81,7 +80,7 @@ namespace Poly2Tri {
 		public void update(string message) {
 		}
 
-		public virtual void clear() {
+		public virtual void Clear() {
 			_points.clear();
 			if (_debug != null) {
 				_debug.clear();
@@ -98,11 +97,7 @@ namespace Poly2Tri {
 		public void terminateTriangulation() {
 		}
 
-		public boolean isDebugEnabled() {
-			return _debugEnabled;
-		}
-
-		public abstract void isDebugEnabled(boolean b);
+		public virtual bool IsDebugEnabled { get; protected set; }
 
 		public TriangulationDebugContext getDebugContext() {
 			return _debug;

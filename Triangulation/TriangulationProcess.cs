@@ -189,8 +189,8 @@ namespace Poly2Tri {
 			try {
 				var time = DateTime.Now;
 				foreach (Triangulatable t in _triangulations) {
-					_tcx.clear();
-					_tcx.prepareTriangulation(t);
+					_tcx.Clear();
+					_tcx.PrepareTriangulation(t);
 					_pointCount += _tcx._points.size();
 					Poly2Tri.Triangulate(_tcx);
 				}

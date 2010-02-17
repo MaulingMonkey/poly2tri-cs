@@ -30,51 +30,8 @@
  */
 
 namespace Poly2Tri {
-	/*
-	 * Extends the PointSet by adding some Constraints on how it will be triangulated<br>
-	 * A constraint defines an edge between two points in the set, these edges can not
-	 * be crossed. They will be enforced triangle edges after a triangulation.
-	 * <p>
-	 * 
-	 * 
-	 * @author Thomas Åhlén, thahlen@gmail.com
-	 */
-	public class ConstrainedPointSet : PointSet {
-		int[] _index;
-
-		public ConstrainedPointSet(ArrayList<TriangulationPoint> points, int[] index)
-			: base(points) {
-			_index = index;
-		}
-
-		public override TriangulationMode TriangulationMode { get { return TriangulationMode.CONSTRAINED; } }
-
-		//    protected void addIndex( int[] index )
-		//    {
-		//        
-		//    }
-
-		public int[] getEdgeIndex() {
-			return _index;
-		}
-
-		public override void Prepare(TriangulationContext tcx) {
-			base.Prepare(tcx);
-			for (int i = 0; i < _index.Length; i += 2) {
-				// XXX: must change!!
-				tcx.NewConstraint(_points.get(_index[i]), _points.get(_index[i + 1]));
-			}
-		}
-
-		/**
-		 * TODO: TO BE IMPLEMENTED!
-		 * Peforms a validation on given input<br>
-		 * 1. Check's if there any constraint edges are crossing or collinear<br>
-		 * 2. 
-		 * @return
-		 */
-		public bool isValid() {
-			return true;
-		}
+	public class DTSweepEdgeEvent {
+		public DTSweepConstraint constrainedEdge;
+		public bool right;
 	}
 }

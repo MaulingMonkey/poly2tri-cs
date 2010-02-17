@@ -36,9 +36,9 @@ namespace Poly2Tri {
 		public static void Triangulate(PolygonSet ps) {
 			TriangulationContext tcx = CreateContext(_defaultAlgorithm);
 			foreach (Polygon p in ps.Polygons) {
-				tcx.prepareTriangulation(p);
+				tcx.PrepareTriangulation(p);
 				Triangulate(tcx);
-				tcx.clear();
+				tcx.Clear();
 			}
 		}
 
@@ -67,13 +67,13 @@ namespace Poly2Tri {
 
 			//        long time = System.nanoTime();
 			tcx = CreateContext(algorithm);
-			tcx.prepareTriangulation(t);
+			tcx.PrepareTriangulation(t);
 			Triangulate(tcx);
 			//        logger.info( "Triangulation of {} points [{}ms]", tcx.getPoints().size(), ( System.nanoTime() - time ) / 1e6 );
 		}
 
 		public static void Triangulate(TriangulationContext tcx) {
-			switch (tcx.algorithm()) {
+			switch (tcx.Algorithm()) {
 			case TriangulationAlgorithm.DTSweep:
 			default:
 				DTSweep.Triangulate((DTSweepContext)tcx);

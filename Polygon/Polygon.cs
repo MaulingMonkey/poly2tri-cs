@@ -193,17 +193,17 @@ namespace Poly2Tri {
 			}
 
 			// Outer constraints
-			for (int i = 0; i < _points.size() - 1; i++) tcx.newConstraint(_points.get(i), _points.get(i + 1));
-			tcx.newConstraint(_points.get(0), _points.get(_points.size() - 1));
+			for (int i = 0; i < _points.size() - 1; i++) tcx.NewConstraint(_points.get(i), _points.get(i + 1));
+			tcx.NewConstraint(_points.get(0), _points.get(_points.size() - 1));
 			tcx.addPoints(_points);
 
 			// Hole constraints
 			if (_holes != null) {
 				foreach (Polygon p in _holes) {
 					for (int i = 0; i < p._points.size() - 1; i++) {
-						tcx.newConstraint(p._points.get(i), p._points.get(i + 1));
+						tcx.NewConstraint(p._points.get(i), p._points.get(i + 1));
 					}
-					tcx.newConstraint(p._points.get(0), p._points.get(p._points.size() - 1));
+					tcx.NewConstraint(p._points.get(0), p._points.get(p._points.size() - 1));
 					tcx.addPoints(p._points);
 				}
 			}
