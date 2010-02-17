@@ -91,7 +91,7 @@ namespace Poly2Tri {
 		private void meshCleanReq(DelaunayTriangle triangle) {
 			if (triangle != null && !triangle.isInterior()) {
 				triangle.isInterior(true);
-				_triUnit.addTriangle(triangle);
+				_triUnit.AddTriangle(triangle);
 				for (int i = 0; i < 3; i++) {
 					if (!triangle.cEdge[i]) {
 						meshCleanReq(triangle.neighbors[i]);
@@ -225,7 +225,7 @@ namespace Poly2Tri {
 
 
 		public void finalizeTriangulation() {
-			_triUnit.addTriangles(_triList);
+			_triUnit.AddTriangles(_triList);
 			_triList.clear();
 		}
 

@@ -47,9 +47,7 @@ namespace Poly2Tri {
 			_index = index;
 		}
 
-		public override TriangulationMode getTriangulationMode() {
-			return TriangulationMode.CONSTRAINED;
-		}
+		public override TriangulationMode TriangulationMode { get { return TriangulationMode.CONSTRAINED; } }
 
 		//    protected void addIndex( int[] index )
 		//    {
@@ -60,8 +58,8 @@ namespace Poly2Tri {
 			return _index;
 		}
 
-		public override void prepare(TriangulationContext tcx) {
-			base.prepare(tcx);
+		public override void Prepare(TriangulationContext tcx) {
+			base.Prepare(tcx);
 			for (int i = 0; i < _index.Length; i += 2) {
 				// XXX: must change!!
 				tcx.newConstraint(_points.get(_index[i]), _points.get(_index[i + 1]));

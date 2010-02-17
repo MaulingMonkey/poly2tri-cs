@@ -1,123 +1,129 @@
-﻿using System;
+﻿/* Poly2Tri
+ * Copyright (c) 2009-2010, Poly2Tri Contributors
+ * http://code.google.com/p/poly2tri/
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ * * Neither the name of Poly2Tri nor the names of its contributors may be
+ *   used to endorse or promote products derived from this software without specific
+ *   prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/// Changes from the Java version
+///   Polygon constructors sprused up, checks for 3+ polys
+///   Naming of everything
+///   getTriangulationMode() -> TriangulationMode { get; }
+///   RuntimeExceptions replaced
+/// Future possibilities
+///   We have a lot of Add/Clear methods -- we may prefer to just expose the container
+///   Some self-explanitory methods may deserve commenting anyways
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Poly2Tri {
 	public class Polygon : Triangulatable {
 		protected ArrayList<TriangulationPoint> _points = new ArrayList<TriangulationPoint>();
 		protected ArrayList<TriangulationPoint> _steinerPoints;
 		protected ArrayList<Polygon> _holes;
-
-		protected ArrayList<DelaunayTriangle> m_triangles;
-
+		protected ArrayList<DelaunayTriangle> _triangles;
 		protected PolygonPoint _last;
 
-		/**
-		 * To create a polygon we need atleast 3 separate points
-		 * 
-		 * @param p1
-		 * @param p2
-		 * @param p3
-		 */
-		public Polygon(PolygonPoint p1, PolygonPoint p2, PolygonPoint p3) {
-			p1._next = p2;
-			p2._next = p3;
-			p3._next = p1;
-			p1._previous = p3;
-			p2._previous = p1;
-			p3._previous = p2;
-		}
+		/// <summary>
+		/// Create a polygon from a list of at least 3 points with no duplicates.
+		/// </summary>
+		/// <param name="points">A list of unique points</param>
+		public Polygon( IList<PolygonPoint> points ) {
+			if (points.Count < 3) throw new ArgumentException("List has fewer than 3 points", "points");
 
-		/**
-		 * Requires atleast 3 points
-		 * @param points - ordered list of points forming the polygon. 
-		 *                 No duplicates are allowed
-		 */
-		public Polygon(ArrayList<PolygonPoint> points) {
 			// Lets do one sanity check that first and last point hasn't got same position
 			// Its something that often happen when importing polygon data from other formats
-			if (points.get(0).Equals(points.get(points.size() - 1))) {
-				//logger.warn("Removed duplicate point");
-				points.remove(points.size() - 1);
-			}
+			if (points[0].Equals(points[points.Count - 1])) points.RemoveAt(points.Count - 1);
+
 			_points.addAll(points);
 		}
 
-		/**
-		 * Requires atleast 3 points
-		 *
-		 * @param points
-		 */
-		public Polygon(PolygonPoint[] points): this(new ArrayList<PolygonPoint>(points)) {}
+		/// <summary>
+		/// Create a polygon from a list of at least 3 points with no duplicates.
+		/// </summary>
+		/// <param name="points">A list of unique points.</param>
+		public Polygon( IEnumerable<PolygonPoint> points ): this( (points as IList<PolygonPoint>) ?? points.ToArray() ) {}
 
-		public TriangulationMode getTriangulationMode() {
-			return TriangulationMode.POLYGON;
-		}
+		/// <summary>
+		/// Create a polygon from a list of at least 3 points with no duplicates.
+		/// </summary>
+		/// <param name="points">A list of unique points.</param>
+		public Polygon( params PolygonPoint[] points ) : this((IList<PolygonPoint>)points) { }
 
-		public int pointCount() {
-			int count = _points.size();
-			if (_steinerPoints != null) {
-				count += _steinerPoints.size();
-			}
-			return count;
-		}
+		public TriangulationMode TriangulationMode { get { return TriangulationMode.POLYGON; } }
 
-		public void addSteinerPoint(TriangulationPoint point) {
-			if (_steinerPoints == null) {
-				_steinerPoints = new ArrayList<TriangulationPoint>();
-			}
+		public void AddSteinerPoint( TriangulationPoint point ) {
+			if (_steinerPoints == null) _steinerPoints = new ArrayList<TriangulationPoint>();
 			_steinerPoints.add(point);
 		}
 
-		public void addSteinerPoints(List<TriangulationPoint> points) {
-			if (_steinerPoints == null) {
-				_steinerPoints = new ArrayList<TriangulationPoint>();
-			}
+		public void AddSteinerPoints( List<TriangulationPoint> points ) {
+			if (_steinerPoints == null) _steinerPoints = new ArrayList<TriangulationPoint>();
 			_steinerPoints.addAll(points);
 		}
 
-		public void clearSteinerPoints() {
-			if (_steinerPoints != null) {
-				_steinerPoints.clear();
-			}
+		public void ClearSteinerPoints() {
+			if (_steinerPoints != null) _steinerPoints.clear();
 		}
 
-		/**
-		 * Assumes: that given polygon is fully inside the current polygon 
-		 * @param poly - a subtraction polygon
-		 */
-		public void addHole(Polygon poly) {
-			if (_holes == null) {
-				_holes = new ArrayList<Polygon>();
-			}
+		/// <summary>
+		/// Add a hole to the polygon.
+		/// </summary>
+		/// <param name="poly">A subtraction polygon fully contained inside this polygon.</param>
+		public void AddHole( Polygon poly ) {
+			if (_holes == null) _holes = new ArrayList<Polygon>();
 			_holes.add(poly);
 			// XXX: tests could be made here to be sure it is fully inside
 			//        addSubtraction( poly.getPoints() );
 		}
 
-		/**
-		 * Will insert a point in the polygon after given point 
-		 * 
-		 * @param a
-		 * @param b
-		 * @param p
-		 */
-		public void insertPointAfter(PolygonPoint a, PolygonPoint newPoint) {
+		/// <summary>
+		/// Inserts newPoint after point.
+		/// </summary>
+		/// <param name="point">The point to insert after in the polygon</param>
+		/// <param name="newPoint">The point to insert into the polygon</param>
+		public void InsertPointAfter( PolygonPoint point, PolygonPoint newPoint ) {
 			// Validate that 
-			int index = _points.indexOf(a);
-			if (index != -1) {
-				newPoint.setNext(a.getNext());
-				newPoint.setPrevious(a);
-				a.getNext().setPrevious(newPoint);
-				a.setNext(newPoint);
-				_points.add(index + 1, newPoint);
-			} else {
-				throw new RuntimeException("Tried to insert a point into a Polygon after a point not belonging to the Polygon");
-			}
+			int index = _points.indexOf(point);
+			if (index == -1) throw new ArgumentException("Tried to insert a point into a Polygon after a point not belonging to the Polygon", "point");
+			newPoint.setNext(point.getNext());
+			newPoint.setPrevious(point);
+			point.getNext().setPrevious(newPoint);
+			point.setNext(newPoint);
+			_points.add(index + 1, newPoint);
 		}
 
-		public void addPoints(List<PolygonPoint> list) {
+		/// <summary>
+		/// Inserts list (after last point in polygon?)
+		/// </summary>
+		/// <param name="list"></param>
+		public void AddPoints( IEnumerable<PolygonPoint> list ) {
 			PolygonPoint first;
 			foreach (PolygonPoint p in list) {
 				p.setPrevious(_last);
@@ -133,19 +139,22 @@ namespace Poly2Tri {
 			first.setPrevious(_last);
 		}
 
-		/**
-		 * Will add a point after the last point added
-		 * 
-		 * @param p
-		 */
-		public void addPoint(PolygonPoint p) {
+		/// <summary>
+		/// Adds a point after the last in the polygon.
+		/// </summary>
+		/// <param name="p">The point to add</param>
+		public void AddPoint( PolygonPoint p ) {
 			p.setPrevious(_last);
 			p.setNext(_last.getNext());
 			_last.setNext(p);
 			_points.add(p);
 		}
 
-		public void removePoint(PolygonPoint p) {
+		/// <summary>
+		/// Removes a point from the polygon.
+		/// </summary>
+		/// <param name="p"></param>
+		public void RemovePoint( PolygonPoint p ) {
 			PolygonPoint next, prev;
 
 			next = p.getNext();
@@ -155,46 +164,36 @@ namespace Poly2Tri {
 			_points.remove(p);
 		}
 
-		public PolygonPoint getPoint() {
-			return _last;
+		public IList<TriangulationPoint> Points { get { return _points; } }
+		public IList<DelaunayTriangle> Triangles { get { return _triangles; } }
+
+		public void AddTriangle( DelaunayTriangle t ) {
+			_triangles.add(t);
 		}
 
-		public IEnumerable<TriangulationPoint> getPoints() {
-			return _points;
+		public void AddTriangles( ArrayList<DelaunayTriangle> list ) {
+			_triangles.addAll(list);
 		}
 
-		public IEnumerable<DelaunayTriangle> getTriangles() {
-			return m_triangles;
-		}
-
-		public void addTriangle(DelaunayTriangle t) {
-			m_triangles.add(t);
-		}
-
-		public void addTriangles(ArrayList<DelaunayTriangle> list) {
-			m_triangles.addAll(list);
-		}
-
-		public void clearTriangulation() {
-			if (m_triangles != null) {
-				m_triangles.clear();
+		public void ClearTriangles() {
+			if (_triangles != null) {
+				_triangles.clear();
 			}
 		}
 
-		/**
-		 * Creates constraints and populates the context with points
-		 */
-		public void prepare(TriangulationContext tcx) {
-			if (m_triangles == null) {
-				m_triangles = new ArrayList<DelaunayTriangle>(_points.size());
+		/// <summary>
+		/// Creates constraints and populates the context with points
+		/// </summary>
+		/// <param name="tcx">The context</param>
+		public void Prepare( TriangulationContext tcx ) {
+			if (_triangles == null) {
+				_triangles = new ArrayList<DelaunayTriangle>(_points.size());
 			} else {
-				m_triangles.clear();
+				_triangles.clear();
 			}
 
 			// Outer constraints
-			for (int i = 0; i < _points.size() - 1; i++) {
-				tcx.newConstraint(_points.get(i), _points.get(i + 1));
-			}
+			for (int i = 0; i < _points.size() - 1; i++) tcx.newConstraint(_points.get(i), _points.get(i + 1));
 			tcx.newConstraint(_points.get(0), _points.get(_points.size() - 1));
 			tcx.addPoints(_points);
 

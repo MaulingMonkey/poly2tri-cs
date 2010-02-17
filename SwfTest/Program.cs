@@ -32,7 +32,7 @@ namespace SwfTest {
 			var fx = e.Graphics;
 			fx.TranslateTransform(500, 500);
 			fx.ScaleTransform(1, -1);
-			foreach (var tri in Monkey.getTriangles()) {
+			foreach ( var tri in Monkey.Triangles ) {
 				fx.DrawLines(Pens.Green, new PointF[]
 					{ new PointF(5*tri.points[0].getXf(),5*tri.points[0].getYf())
 					, new PointF(5*tri.points[1].getXf(),5*tri.points[1].getYf())

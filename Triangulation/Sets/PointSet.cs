@@ -41,31 +41,24 @@ namespace Poly2Tri {
 			_points.addAll(points);
 		}
 
-		public virtual TriangulationMode getTriangulationMode() {
-			return TriangulationMode.UNCONSTRAINED;
-		}
+		public virtual TriangulationMode TriangulationMode { get { return TriangulationMode.UNCONSTRAINED; }}
 
-		public IEnumerable<TriangulationPoint> getPoints() {
-			return _points;
-		}
+		public IList<TriangulationPoint> Points { get { return _points; } }
+		public IList<DelaunayTriangle> Triangles { get { return _triangles; }}
 
-		public IEnumerable<DelaunayTriangle> getTriangles() {
-			return _triangles;
-		}
-
-		public void addTriangle(DelaunayTriangle t) {
+		public void AddTriangle(DelaunayTriangle t) {
 			_triangles.add(t);
 		}
 
-		public void addTriangles(ArrayList<DelaunayTriangle> list) {
+		public void AddTriangles(ArrayList<DelaunayTriangle> list) {
 			_triangles.addAll(list);
 		}
 
-		public void clearTriangulation() {
+		public void ClearTriangles() {
 			_triangles.clear();
 		}
 
-		public virtual void prepare(TriangulationContext tcx) {
+		public virtual void Prepare(TriangulationContext tcx) {
 			if (_triangles == null) {
 				_triangles = new ArrayList<DelaunayTriangle>(_points.size());
 			} else {

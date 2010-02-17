@@ -56,8 +56,8 @@ namespace Poly2Tri {
 
 		public virtual void prepareTriangulation(Triangulatable t) {
 			_triUnit = t;
-			_triangulationMode = t.getTriangulationMode();
-			t.prepare(this);
+			_triangulationMode = t.TriangulationMode;
+			t.Prepare(this);
 		}
 
 		public abstract TriangulationConstraint newConstraint(TriangulationPoint a, TriangulationPoint b);

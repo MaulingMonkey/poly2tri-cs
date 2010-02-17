@@ -5,13 +5,15 @@ using System.Text;
 
 namespace Poly2Tri {
 	public interface Triangulatable {
-		void prepare(TriangulationContext tcx);
+		void Prepare(TriangulationContext tcx);
 
-		IEnumerable<DelaunayTriangle> getTriangles();
-		void addTriangle(DelaunayTriangle t);
-		void addTriangles(ArrayList<DelaunayTriangle> list);
-		void clearTriangulation();
+		IList<TriangulationPoint> Points { get; } // MM: Neither of these are used via interface (yet?)
+		IList<DelaunayTriangle> Triangles { get; }
 
-		TriangulationMode getTriangulationMode();
+		void AddTriangle(DelaunayTriangle t);
+		void AddTriangles(ArrayList<DelaunayTriangle> list);
+		void ClearTriangles();
+
+		TriangulationMode TriangulationMode { get; }
 	}
 }
