@@ -45,8 +45,6 @@
     <Compile Include="Polygon\Polygon.cs" />
     <Compile Include="Polygon\PolygonPoint.cs" />
     <Compile Include="Polygon\PolygonSet.cs" />
-    <Compile Include="Position\CoordinateTransformer.cs" />
-    <Compile Include="Position\NoTransform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Triangulation\Delaunay\DelaunayTriangle.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\AdvancingFront.cs" />
