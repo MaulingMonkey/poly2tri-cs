@@ -112,10 +112,10 @@ namespace Poly2Tri {
 			// Validate that 
 			int index = _points.indexOf(point);
 			if (index == -1) throw new ArgumentException("Tried to insert a point into a Polygon after a point not belonging to the Polygon", "point");
-			newPoint.setNext(point.getNext());
-			newPoint.setPrevious(point);
-			point.getNext().setPrevious(newPoint);
-			point.setNext(newPoint);
+			newPoint.Next = point.Next;
+			newPoint.Previous = point;
+			point.Next.Previous = newPoint;
+			point.Next = newPoint;
 			_points.add(index + 1, newPoint);
 		}
 
@@ -126,17 +126,17 @@ namespace Poly2Tri {
 		public void AddPoints( IEnumerable<PolygonPoint> list ) {
 			PolygonPoint first;
 			foreach (PolygonPoint p in list) {
-				p.setPrevious(_last);
+				p.Previous = _last;
 				if (_last != null) {
-					p.setNext(_last.getNext());
-					_last.setNext(p);
+					p.Next = _last.Next;
+					_last.Next = p;
 				}
 				_last = p;
 				_points.add(p);
 			}
 			first = (PolygonPoint)_points.get(0);
-			_last.setNext(first);
-			first.setPrevious(_last);
+			_last.Next = first;
+			first.Previous = _last;
 		}
 
 		/// <summary>
@@ -144,9 +144,9 @@ namespace Poly2Tri {
 		/// </summary>
 		/// <param name="p">The point to add</param>
 		public void AddPoint( PolygonPoint p ) {
-			p.setPrevious(_last);
-			p.setNext(_last.getNext());
-			_last.setNext(p);
+			p.Previous = _last;
+			p.Next = _last.Next;
+			_last.Next = p;
 			_points.add(p);
 		}
 
@@ -157,10 +157,10 @@ namespace Poly2Tri {
 		public void RemovePoint( PolygonPoint p ) {
 			PolygonPoint next, prev;
 
-			next = p.getNext();
-			prev = p.getPrevious();
-			prev.setNext(next);
-			next.setPrevious(prev);
+			next = p.Next;
+			prev = p.Previous;
+			prev.Next = next;
+			next.Previous = prev;
 			_points.remove(p);
 		}
 
