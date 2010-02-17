@@ -174,7 +174,7 @@ namespace Poly2Tri {
 			if (_thread == null || _thread.ThreadState == ThreadState.Stopped) {
 				_isTerminated = false;
 				_thread = new Thread(this.run);
-				_thread.Name = _algorithm.ToString() + "." + _tcx.getTriangulationMode().ToString();
+				_thread.Name = _algorithm.ToString() + "." + _tcx.TriangulationMode.ToString();
 				_thread.Start();
 				sendEvent(TriangulationProcessEvent.Started);
 			} else {

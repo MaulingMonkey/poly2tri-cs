@@ -55,6 +55,7 @@
     <Compile Include="Triangulation\Delaunay\Sweep\DTSweepDebugContext.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\DTSweepPointComparator.cs" />
     <Compile Include="Triangulation\Delaunay\Sweep\PointOnEdgeException.cs" />
+    <Compile Include="Triangulation\Orientation.cs" />
     <Compile Include="Triangulation\Point\TPoint.cs" />
     <Compile Include="Triangulation\Sets\ConstrainedPointSet.cs" />
     <Compile Include="Triangulation\Sets\PointSet.cs" />

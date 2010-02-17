@@ -212,9 +212,6 @@ public class TriangulationUtil
         return Orientation.CW;
     }
 
-    public enum Orientation
-    {
-        CW,CCW,Collinear
-    }
+
 }
 }

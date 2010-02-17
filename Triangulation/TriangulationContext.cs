@@ -89,9 +89,7 @@ namespace Poly2Tri {
 			_stepCount = 0;
 		}
 
-		public TriangulationMode getTriangulationMode() {
-			return _triangulationMode;
-		}
+		public TriangulationMode TriangulationMode { get { return _triangulationMode; }}
 
 		public void waitUntilNotified(boolean b) {
 			_waitUntilNotified = b;
