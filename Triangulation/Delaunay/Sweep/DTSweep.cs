@@ -117,19 +117,19 @@ namespace Poly2Tri {
 			DelaunayTriangle t1;//, t2;
 			TriangulationPoint first, p1;//, p2;
 
-			n1 = tcx.aFront.Head.next;
-			n2 = n1.next;
-			n3 = n2.next;
-			first = n1.point;
+			n1 = tcx.aFront.Head.Next;
+			n2 = n1.Next;
+			n3 = n2.Next;
+			first = n1.Point;
 
 			turnAdvancingFrontConvex(tcx, n2, n3);
 
 			// TODO: implement ConvexHull for lower right and left boundary
 			// Lower right boundary 
-			first = tcx.aFront.Head.point;
-			n2 = tcx.aFront.Tail.prev;
-			t1 = n2.triangle;
-			p1 = n2.point;
+			first = tcx.aFront.Head.Point;
+			n2 = tcx.aFront.Tail.Prev;
+			t1 = n2.Triangle;
+			p1 = n2.Point;
 			do {
 				tcx.removeFromList(t1);
 				p1 = t1.pointCCW(p1);
@@ -138,9 +138,9 @@ namespace Poly2Tri {
 			} while (true);
 
 			// Lower left boundary
-			first = tcx.aFront.Head.next.point;
-			p1 = t1.pointCW(tcx.aFront.Head.point);
-			t1 = t1.neighborCW(tcx.aFront.Head.point);
+			first = tcx.aFront.Head.Next.Point;
+			p1 = t1.pointCW(tcx.aFront.Head.Point);
+			t1 = t1.neighborCW(tcx.aFront.Head.Point);
 			do {
 				tcx.removeFromList(t1);
 				p1 = t1.pointCCW(p1);
@@ -161,20 +161,20 @@ namespace Poly2Tri {
 			while (c != tcx.aFront.Tail) {
 				if (tcx.isDebugEnabled()) { (tcx.getDebugContext() as DTSweepDebugContext).setActiveNode(c); }
 
-				if (orient2d(b.point, c.point, c.next.point) == Orientation.CCW) {
+				if (orient2d(b.Point, c.Point, c.Next.Point) == Orientation.CCW) {
 					// [b,c,d] Concave - fill around c
 					fill(tcx, c);
-					c = c.next;
+					c = c.Next;
 				} else {
 					// [b,c,d] Convex
-					if (b != first && orient2d(b.prev.point, b.point, c.point) == Orientation.CCW) {
+					if (b != first && orient2d(b.Prev.Point, b.Point, c.Point) == Orientation.CCW) {
 						// [a,b,c] Concave - fill around b
 						fill(tcx, b);
-						b = b.prev;
+						b = b.Prev;
 					} else {
 						// [a,b,c] Convex - nothing to fill
 						b = c;
-						c = c.next;
+						c = c.Next;
 					}
 				}
 			}
@@ -182,8 +182,8 @@ namespace Poly2Tri {
 
 		private static void finalizationPolygon(DTSweepContext tcx) {
 			// Get an Internal triangle to start with
-			DelaunayTriangle t = tcx.aFront.Head.next.triangle;
-			TriangulationPoint p = tcx.aFront.Head.next.point;
+			DelaunayTriangle t = tcx.aFront.Head.Next.Triangle;
+			TriangulationPoint p = tcx.aFront.Head.Next.Point;
 			while (!t.getConstrainedEdgeCW(p)) {
 				t = t.neighborCCW(p);
 			}
@@ -211,7 +211,7 @@ namespace Poly2Tri {
 
 			// Only need to check +epsilon since point never have smaller 
 			// x value than node due to how we fetch nodes from the front
-			if (point.getX() <= node.point.getX() + TriangulationUtil.EPSILON) {
+			if (point.getX() <= node.Point.getX() + TriangulationUtil.EPSILON) {
 				fill(tcx, node);
 			}
 			tcx.addNode(newNode);
@@ -234,15 +234,15 @@ namespace Poly2Tri {
 			AdvancingFrontNode newNode;
 			DelaunayTriangle triangle;
 
-			triangle = new DelaunayTriangle(point, node.point, node.next.point);
-			triangle.markNeighbor(node.triangle);
+			triangle = new DelaunayTriangle(point, node.Point, node.Next.Point);
+			triangle.markNeighbor(node.Triangle);
 			tcx.addToList(triangle);
 
 			newNode = new AdvancingFrontNode(point);
-			newNode.next = node.next;
-			newNode.prev = node;
-			node.next.prev = newNode;
-			node.next = newNode;
+			newNode.Next = node.Next;
+			newNode.Prev = node;
+			node.Next.Prev = newNode;
+			node.Next = newNode;
 
 			tcx.addNode(newNode); // XXX: BST
 
@@ -269,9 +269,9 @@ namespace Poly2Tri {
 				tcx.edgeEvent.constrainedEdge = edge;
 				tcx.edgeEvent.right = edge.p.getX() > edge.q.getX();
 
-				if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setPrimaryTriangle(node.triangle); }
+				if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setPrimaryTriangle(node.Triangle); }
 
-				if (isEdgeSideOfTriangle(node.triangle, edge.p, edge.q)) {
+				if (isEdgeSideOfTriangle(node.Triangle, edge.p, edge.q)) {
 					return;
 				}
 
@@ -280,7 +280,7 @@ namespace Poly2Tri {
 				//       but for now this avoid the issue with cases that needs both flips and fills
 				fillEdgeEvent(tcx, edge, node);
 
-				edgeEvent(tcx, edge.p, edge.q, node.triangle, edge.q);
+				edgeEvent(tcx, edge.p, edge.q, node.Triangle, edge.q);
 			} catch (PointOnEdgeException) {
 				//logger.warn("Skipping edge: {}", e.getMessage());
 			}
@@ -295,12 +295,12 @@ namespace Poly2Tri {
 		}
 
 		private static void fillRightConcaveEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
-			fill(tcx, node.next);
-			if (node.next.point != edge.p) {
+			fill(tcx, node.Next);
+			if (node.Next.Point != edge.p) {
 				// Next above or below edge?
-				if (orient2d(edge.q, node.next.point, edge.p) == Orientation.CCW) {
+				if (orient2d(edge.q, node.Next.Point, edge.p) == Orientation.CCW) {
 					// Below
-					if (orient2d(node.point, node.next.point, node.next.next.point) == Orientation.CCW) {
+					if (orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 						// Next is concave
 						fillRightConcaveEdgeEvent(tcx, edge, node);
 					} else {
@@ -312,15 +312,15 @@ namespace Poly2Tri {
 
 		private static void fillRightConvexEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
 			// Next concave or convex?
-			if (orient2d(node.next.point, node.next.next.point, node.next.next.next.point) == Orientation.CCW) {
+			if (orient2d(node.Next.Point, node.Next.Next.Point, node.Next.Next.Next.Point) == Orientation.CCW) {
 				// Concave
-				fillRightConcaveEdgeEvent(tcx, edge, node.next);
+				fillRightConcaveEdgeEvent(tcx, edge, node.Next);
 			} else {
 				// Convex
 				// Next above or below edge?
-				if (orient2d(edge.q, node.next.next.point, edge.p) == Orientation.CCW) {
+				if (orient2d(edge.q, node.Next.Next.Point, edge.p) == Orientation.CCW) {
 					// Below
-					fillRightConvexEdgeEvent(tcx, edge, node.next);
+					fillRightConvexEdgeEvent(tcx, edge, node.Next);
 				} else {
 					// Above
 				}
@@ -329,9 +329,9 @@ namespace Poly2Tri {
 
 		private static void fillRightBelowEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
 			if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setActiveNode(node); }
-			if (node.point.getX() < edge.p.getX()) // needed?
+			if (node.Point.getX() < edge.p.getX()) // needed?
         {
-				if (orient2d(node.point, node.next.point, node.next.next.point) == Orientation.CCW) {
+				if (orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 					// Concave 
 					fillRightConcaveEdgeEvent(tcx, edge, node);
 				} else {
@@ -345,29 +345,29 @@ namespace Poly2Tri {
 		}
 
 		private static void fillRightAboveEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
-			while (node.next.point.getX() < edge.p.getX()) {
+			while (node.Next.Point.getX() < edge.p.getX()) {
 				if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setActiveNode(node); }
 				// Check if next node is below the edge
-				Orientation o1 = orient2d(edge.q, node.next.point, edge.p);
+				Orientation o1 = orient2d(edge.q, node.Next.Point, edge.p);
 				if (o1 == Orientation.CCW) {
 					fillRightBelowEdgeEvent(tcx, edge, node);
 				} else {
-					node = node.next;
+					node = node.Next;
 				}
 			}
 		}
 
 		private static void fillLeftConvexEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
 			// Next concave or convex?
-			if (orient2d(node.prev.point, node.prev.prev.point, node.prev.prev.prev.point) == Orientation.CW) {
+			if (orient2d(node.Prev.Point, node.Prev.Prev.Point, node.Prev.Prev.Prev.Point) == Orientation.CW) {
 				// Concave
-				fillLeftConcaveEdgeEvent(tcx, edge, node.prev);
+				fillLeftConcaveEdgeEvent(tcx, edge, node.Prev);
 			} else {
 				// Convex
 				// Next above or below edge?
-				if (orient2d(edge.q, node.prev.prev.point, edge.p) == Orientation.CW) {
+				if (orient2d(edge.q, node.Prev.Prev.Point, edge.p) == Orientation.CW) {
 					// Below
-					fillLeftConvexEdgeEvent(tcx, edge, node.prev);
+					fillLeftConvexEdgeEvent(tcx, edge, node.Prev);
 				} else {
 					// Above
 				}
@@ -375,12 +375,12 @@ namespace Poly2Tri {
 		}
 
 		private static void fillLeftConcaveEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
-			fill(tcx, node.prev);
-			if (node.prev.point != edge.p) {
+			fill(tcx, node.Prev);
+			if (node.Prev.Point != edge.p) {
 				// Next above or below edge?
-				if (orient2d(edge.q, node.prev.point, edge.p) == Orientation.CW) {
+				if (orient2d(edge.q, node.Prev.Point, edge.p) == Orientation.CW) {
 					// Below
-					if (orient2d(node.point, node.prev.point, node.prev.prev.point) == Orientation.CW) {
+					if (orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
 						// Next is concave
 						fillLeftConcaveEdgeEvent(tcx, edge, node);
 					} else {
@@ -392,8 +392,8 @@ namespace Poly2Tri {
 
 		private static void fillLeftBelowEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
 			if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setActiveNode(node); }
-			if (node.point.getX() > edge.p.getX()) {
-				if (orient2d(node.point, node.prev.point, node.prev.prev.point) == Orientation.CW) {
+			if (node.Point.getX() > edge.p.getX()) {
+				if (orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
 					// Concave 
 					fillLeftConcaveEdgeEvent(tcx, edge, node);
 				} else {
@@ -407,14 +407,14 @@ namespace Poly2Tri {
 		}
 
 		private static void fillLeftAboveEdgeEvent(DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node) {
-			while (node.prev.point.getX() > edge.p.getX()) {
+			while (node.Prev.Point.getX() > edge.p.getX()) {
 				if (tcx.isDebugEnabled()) { tcx.getDebugContextAsDT().setActiveNode(node); }
 				// Check if next node is below the edge
-				Orientation o1 = orient2d(edge.q, node.prev.point, edge.p);
+				Orientation o1 = orient2d(edge.q, node.Prev.Point, edge.p);
 				if (o1 == Orientation.CW) {
 					fillLeftBelowEdgeEvent(tcx, edge, node);
 				} else {
-					node = node.prev;
+					node = node.Prev;
 				}
 			}
 		}
@@ -702,29 +702,29 @@ namespace Poly2Tri {
 			double angle;
 
 			// Fill right holes
-			node = n.next;
-			while (node.next != null) {
+			node = n.Next;
+			while (node.HasNext) {
 				angle = holeAngle(node);
 				if (angle > PI_div2 || angle < -PI_div2) {
 					break;
 				}
 				fill(tcx, node);
-				node = node.next;
+				node = node.Next;
 			}
 
 			// Fill left holes
-			node = n.prev;
-			while (node.prev != null) {
+			node = n.Prev;
+			while (node.HasPrev) {
 				angle = holeAngle(node);
 				if (angle > PI_div2 || angle < -PI_div2) {
 					break;
 				}
 				fill(tcx, node);
-				node = node.prev;
+				node = node.Prev;
 			}
 
 			// Fill right basins
-			if (n.hasNext() && n.next.hasNext()) {
+			if (n.HasNext && n.Next.HasNext) {
 				angle = basinAngle(n);
 				if (angle < PI_3div4) {
 					fillBasin(tcx, n);
@@ -742,18 +742,17 @@ namespace Poly2Tri {
 		 * @param node - starting node, this or next node will be left node
 		 */
 		private static void fillBasin(DTSweepContext tcx, AdvancingFrontNode node) {
-			if (orient2d(node.point, node.next.point, node.next.next.point) == Orientation.CCW) {
+			if (orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 				//            tcx.basin.leftNode = node.next.next;
 				tcx.basin.leftNode = node;
 			} else {
-				tcx.basin.leftNode = node.next;
+				tcx.basin.leftNode = node.Next;
 			}
 
 			// Find the bottom and right node
 			tcx.basin.bottomNode = tcx.basin.leftNode;
-			while (tcx.basin.bottomNode.hasNext()
-				  && tcx.basin.bottomNode.point.getY() >= tcx.basin.bottomNode.next.point.getY()) {
-				tcx.basin.bottomNode = tcx.basin.bottomNode.next;
+			while (tcx.basin.bottomNode.HasNext && tcx.basin.bottomNode.Point.getY() >= tcx.basin.bottomNode.Next.Point.getY()) {
+				tcx.basin.bottomNode = tcx.basin.bottomNode.Next;
 			}
 			if (tcx.basin.bottomNode == tcx.basin.leftNode) {
 				// No valid basin
@@ -761,17 +760,16 @@ namespace Poly2Tri {
 			}
 
 			tcx.basin.rightNode = tcx.basin.bottomNode;
-			while (tcx.basin.rightNode.hasNext()
-				  && tcx.basin.rightNode.point.getY() < tcx.basin.rightNode.next.point.getY()) {
-				tcx.basin.rightNode = tcx.basin.rightNode.next;
+			while (tcx.basin.rightNode.HasNext && tcx.basin.rightNode.Point.getY() < tcx.basin.rightNode.Next.Point.getY()) {
+				tcx.basin.rightNode = tcx.basin.rightNode.Next;
 			}
 			if (tcx.basin.rightNode == tcx.basin.bottomNode) {
 				// No valid basins
 				return;
 			}
 
-			tcx.basin.width = tcx.basin.rightNode.getPoint().getX() - tcx.basin.leftNode.getPoint().getX();
-			tcx.basin.leftHighest = tcx.basin.leftNode.getPoint().getY() > tcx.basin.rightNode.getPoint().getY();
+			tcx.basin.width = tcx.basin.rightNode.Point.getX() - tcx.basin.leftNode.Point.getX();
+			tcx.basin.leftHighest = tcx.basin.leftNode.Point.getY() > tcx.basin.rightNode.Point.getY();
 
 			fillBasinReq(tcx, tcx.basin.bottomNode);
 		}
@@ -790,26 +788,26 @@ namespace Poly2Tri {
 			}
 
 			fill(tcx, node);
-			if (node.prev == tcx.basin.leftNode && node.next == tcx.basin.rightNode) {
+			if (node.Prev == tcx.basin.leftNode && node.Next == tcx.basin.rightNode) {
 				return;
-			} else if (node.prev == tcx.basin.leftNode) {
-				Orientation o = orient2d(node.point, node.next.point, node.next.next.point);
+			} else if (node.Prev == tcx.basin.leftNode) {
+				Orientation o = orient2d(node.Point, node.Next.Point, node.Next.Next.Point);
 				if (o == Orientation.CW) {
 					return;
 				}
-				node = node.next;
-			} else if (node.next == tcx.basin.rightNode) {
-				Orientation o = orient2d(node.point, node.prev.point, node.prev.prev.point);
+				node = node.Next;
+			} else if (node.Next == tcx.basin.rightNode) {
+				Orientation o = orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point);
 				if (o == Orientation.CCW) {
 					return;
 				}
-				node = node.prev;
+				node = node.Prev;
 			} else {
 				// Continue with the neighbor node with lowest Y value
-				if (node.prev.point.getY() < node.next.point.getY()) {
-					node = node.prev;
+				if (node.Prev.Point.getY() < node.Next.Point.getY()) {
+					node = node.Prev;
 				} else {
-					node = node.next;
+					node = node.Next;
 				}
 			}
 			fillBasinReq(tcx, node);
@@ -819,9 +817,9 @@ namespace Poly2Tri {
 			double height;
 
 			if (tcx.basin.leftHighest) {
-				height = tcx.basin.leftNode.getPoint().getY() - node.getPoint().getY();
+				height = tcx.basin.leftNode.Point.getY() - node.Point.getY();
 			} else {
-				height = tcx.basin.rightNode.getPoint().getY() - node.getPoint().getY();
+				height = tcx.basin.rightNode.Point.getY() - node.Point.getY();
 			}
 			if (tcx.basin.width > height) {
 				return true;
@@ -845,12 +843,12 @@ namespace Poly2Tri {
 			 * Where x = ax*bx + ay*by
 			 *       y = ax*by - ay*bx
 			 */
-			double px = node.point.getX();
-			double py = node.point.getY();
-			double ax = node.next.point.getX() - px;
-			double ay = node.next.point.getY() - py;
-			double bx = node.prev.point.getX() - px;
-			double by = node.prev.point.getY() - py;
+			double px = node.Point.getX();
+			double py = node.Point.getY();
+			double ax = node.Next.Point.getX() - px;
+			double ay = node.Next.Point.getY() - py;
+			double bx = node.Prev.Point.getX() - px;
+			double by = node.Prev.Point.getY() - py;
 			return Math.Atan2(ax * by - ay * bx, ax * bx + ay * by);
 		}
 
@@ -858,8 +856,8 @@ namespace Poly2Tri {
 		 * The basin angle is decided against the horizontal line [1,0]
 		 */
 		private static double basinAngle(AdvancingFrontNode node) {
-			double ax = node.point.getX() - node.next.next.point.getX();
-			double ay = node.point.getY() - node.next.next.point.getY();
+			double ax = node.Point.getX() - node.Next.Next.Point.getX();
+			double ay = node.Point.getY() - node.Next.Next.Point.getY();
 			return Math.Atan2(ay, ax);
 		}
 
@@ -869,18 +867,18 @@ namespace Poly2Tri {
 		 * @param node - middle node, that is the bottom of the hole
 		 */
 		private static void fill(DTSweepContext tcx, AdvancingFrontNode node) {
-			DelaunayTriangle triangle = new DelaunayTriangle(node.prev.point,
-															  node.point,
-															  node.next.point);
+			DelaunayTriangle triangle = new DelaunayTriangle(node.Prev.Point,
+															  node.Point,
+															  node.Next.Point);
 			// TODO: should copy the cEdge value from neighbor triangles
 			//       for now cEdge values are copied during the legalize 
-			triangle.markNeighbor(node.prev.triangle);
-			triangle.markNeighbor(node.triangle);
+			triangle.markNeighbor(node.Prev.Triangle);
+			triangle.markNeighbor(node.Triangle);
 			tcx.addToList(triangle);
 
 			// Update the advancing front
-			node.prev.next = node.next;
-			node.next.prev = node.prev;
+			node.Prev.Next = node.Next;
+			node.Next.Prev = node.Prev;
 			tcx.removeNode(node);
 
 			// If it was legalized the triangle has already been mapped

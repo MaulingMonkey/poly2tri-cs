@@ -61,10 +61,10 @@ namespace Poly2Tri {
 			StringBuilder sb = new StringBuilder();
 			AdvancingFrontNode node = Head;
 			while (node != Tail) {
-				sb.Append(node.point.getX()).Append("->");
-				node = node.next;
+				sb.Append(node.Point.getX()).Append("->");
+				node = node.Next;
 			}
-			sb.Append(Tail.point.getX());
+			sb.Append(Tail.Point.getX());
 			return sb.ToString();
 		}
 
@@ -85,17 +85,17 @@ namespace Poly2Tri {
 
 		private AdvancingFrontNode LocateNode( double x ) {
 			AdvancingFrontNode node = FindSearchNode(x);
-			if (x < node.value) {
-				while ((node = node.prev) != null)
-					if (x >= node.value) {
+			if (x < node.Value) {
+				while ((node = node.Prev) != null)
+					if (x >= node.Value) {
 						Search = node;
 						return node;
 					}
 			} else {
-				while ((node = node.next) != null)
-					if (x < node.value) {
-						Search = node.prev;
-						return node.prev;
+				while ((node = node.Next) != null)
+					if (x < node.Value) {
+						Search = node.Prev;
+						return node.Prev;
 					}
 			}
 			return null;
@@ -107,23 +107,23 @@ namespace Poly2Tri {
 		public AdvancingFrontNode LocatePoint( TriangulationPoint point ) {
 			double px = point.getX();
 			AdvancingFrontNode node = FindSearchNode(px);
-			double nx = node.point.getX();
+			double nx = node.Point.getX();
 
 			if (px == nx) {
-				if (point != node.point) {
+				if (point != node.Point) {
 					// We might have two nodes with same x value for a short time
-					if (point == node.prev.point) {
-						node = node.prev;
-					} else if (point == node.next.point) {
-						node = node.next;
+					if (point == node.Prev.Point) {
+						node = node.Prev;
+					} else if (point == node.Next.Point) {
+						node = node.Next;
 					} else {
 						throw new RuntimeException("Failed to find Node for given afront point");
 					}
 				}
 			} else if (px < nx) {
-				while ((node = node.prev) != null) if (point == node.point) break;
+				while ((node = node.Prev) != null) if (point == node.Point) break;
 			} else {
-				while ((node = node.next) != null) if (point == node.point) break;
+				while ((node = node.Next) != null) if (point == node.Point) break;
 			}
 			Search = node;
 			return node;

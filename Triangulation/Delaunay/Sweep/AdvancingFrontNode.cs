@@ -29,47 +29,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-using boolean = System.Boolean;
+/// Changes from the Java version
+///   Removed getters
+///   Has* turned into attributes
+/// Future possibilities
+///   Comments!
 
 namespace Poly2Tri {
 	public class AdvancingFrontNode {
-		public AdvancingFrontNode next = null;
-		public AdvancingFrontNode prev = null;
-
-		public object key; // XXX: BST
-		public double value;
-		public TriangulationPoint point;
-		public DelaunayTriangle triangle;
+		public AdvancingFrontNode Next;
+		public AdvancingFrontNode Prev;
+		public double             Value;
+		public TriangulationPoint Point;
+		public DelaunayTriangle   Triangle;
 
 		public AdvancingFrontNode(TriangulationPoint point) {
-			this.point = point;
-			value = point.getX();
-			key = value; // XXX: BST
+			this.Point = point;
+			Value = point.getX();
 		}
 
-		public AdvancingFrontNode getNext() {
-			return next;
-		}
-
-		public AdvancingFrontNode getPrevious() {
-			return prev;
-		}
-
-		public TriangulationPoint getPoint() {
-			return point;
-		}
-
-		public DelaunayTriangle getTriangle() {
-			return triangle;
-		}
-
-		public boolean hasNext() {
-			return next != null;
-		}
-
-		public boolean hasPrevious() {
-			return prev != null;
-		}
+		public bool HasNext { get { return Next != null; } }
+		public bool HasPrev { get { return Prev != null; } }
 	}
 }

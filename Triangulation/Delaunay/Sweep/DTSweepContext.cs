@@ -140,9 +140,9 @@ namespace Poly2Tri {
 			addToList(iTriangle);
 
 			head = new AdvancingFrontNode(iTriangle.points[1]);
-			head.triangle = iTriangle;
+			head.Triangle = iTriangle;
 			middle = new AdvancingFrontNode(iTriangle.points[0]);
-			middle.triangle = iTriangle;
+			middle.Triangle = iTriangle;
 			tail = new AdvancingFrontNode(iTriangle.points[2]);
 
 			aFront = new AdvancingFront(head, tail);
@@ -150,10 +150,10 @@ namespace Poly2Tri {
 
 			// TODO: I think it would be more intuitive if head is middles next and not previous
 			//       so swap head and tail
-			aFront.Head.next = middle;
-			middle.next = aFront.Tail;
-			middle.prev = aFront.Head;
-			aFront.Tail.prev = middle;
+			aFront.Head.Next = middle;
+			middle.Next = aFront.Tail;
+			middle.Prev = aFront.Head;
+			aFront.Tail.Prev = middle;
 		}
 
 		public class Basin {
@@ -181,7 +181,7 @@ namespace Poly2Tri {
 				if (t.neighbors[i] == null) {
 					n = aFront.LocatePoint(t.pointCW(t.points[i]));
 					if (n != null) {
-						n.triangle = t;
+						n.Triangle = t;
 					}
 				}
 			}
