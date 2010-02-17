@@ -118,17 +118,17 @@ namespace Poly2Tri {
 		public void addNode(AdvancingFrontNode node) {
 			//        Console.WriteLine( "add:" + node.key + ":" + System.identityHashCode(node.key));
 			//        m_nodeTree.put( node.getKey(), node );
-			aFront.addNode(node);
+			aFront.AddNode(node);
 		}
 
 		public void removeNode(AdvancingFrontNode node) {
 			//        Console.WriteLine( "remove:" + node.key + ":" + System.identityHashCode(node.key));
 			//        m_nodeTree.delete( node.getKey() );
-			aFront.removeNode(node);
+			aFront.RemoveNode(node);
 		}
 
 		public AdvancingFrontNode locateNode(TriangulationPoint point) {
-			return aFront.locateNode(point);
+			return aFront.LocateNode(point);
 		}
 
 		public void createAdvancingFront() {
@@ -146,14 +146,14 @@ namespace Poly2Tri {
 			tail = new AdvancingFrontNode(iTriangle.points[2]);
 
 			aFront = new AdvancingFront(head, tail);
-			aFront.addNode(middle);
+			aFront.AddNode(middle);
 
 			// TODO: I think it would be more intuitive if head is middles next and not previous
 			//       so swap head and tail
-			aFront.head.next = middle;
-			middle.next = aFront.tail;
-			middle.prev = aFront.head;
-			aFront.tail.prev = middle;
+			aFront.Head.next = middle;
+			middle.next = aFront.Tail;
+			middle.prev = aFront.Head;
+			aFront.Tail.prev = middle;
 		}
 
 		public class Basin {
@@ -179,7 +179,7 @@ namespace Poly2Tri {
 			AdvancingFrontNode n;
 			for (int i = 0; i < 3; i++) {
 				if (t.neighbors[i] == null) {
-					n = aFront.locatePoint(t.pointCW(t.points[i]));
+					n = aFront.LocatePoint(t.pointCW(t.points[i]));
 					if (n != null) {
 						n.triangle = t;
 					}

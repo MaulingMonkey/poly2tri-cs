@@ -117,7 +117,7 @@ namespace Poly2Tri {
 			DelaunayTriangle t1;//, t2;
 			TriangulationPoint first, p1;//, p2;
 
-			n1 = tcx.aFront.head.next;
+			n1 = tcx.aFront.Head.next;
 			n2 = n1.next;
 			n3 = n2.next;
 			first = n1.point;
@@ -126,8 +126,8 @@ namespace Poly2Tri {
 
 			// TODO: implement ConvexHull for lower right and left boundary
 			// Lower right boundary 
-			first = tcx.aFront.head.point;
-			n2 = tcx.aFront.tail.prev;
+			first = tcx.aFront.Head.point;
+			n2 = tcx.aFront.Tail.prev;
 			t1 = n2.triangle;
 			p1 = n2.point;
 			do {
@@ -138,9 +138,9 @@ namespace Poly2Tri {
 			} while (true);
 
 			// Lower left boundary
-			first = tcx.aFront.head.next.point;
-			p1 = t1.pointCW(tcx.aFront.head.point);
-			t1 = t1.neighborCW(tcx.aFront.head.point);
+			first = tcx.aFront.Head.next.point;
+			p1 = t1.pointCW(tcx.aFront.Head.point);
+			t1 = t1.neighborCW(tcx.aFront.Head.point);
 			do {
 				tcx.removeFromList(t1);
 				p1 = t1.pointCCW(p1);
@@ -158,7 +158,7 @@ namespace Poly2Tri {
 													  AdvancingFrontNode b,
 													  AdvancingFrontNode c) {
 			AdvancingFrontNode first = b;
-			while (c != tcx.aFront.tail) {
+			while (c != tcx.aFront.Tail) {
 				if (tcx.isDebugEnabled()) { (tcx.getDebugContext() as DTSweepDebugContext).setActiveNode(c); }
 
 				if (orient2d(b.point, c.point, c.next.point) == Orientation.CCW) {
@@ -182,8 +182,8 @@ namespace Poly2Tri {
 
 		private static void finalizationPolygon(DTSweepContext tcx) {
 			// Get an Internal triangle to start with
-			DelaunayTriangle t = tcx.aFront.head.next.triangle;
-			TriangulationPoint p = tcx.aFront.head.next.point;
+			DelaunayTriangle t = tcx.aFront.Head.next.triangle;
+			TriangulationPoint p = tcx.aFront.Head.next.point;
 			while (!t.getConstrainedEdgeCW(p)) {
 				t = t.neighborCCW(p);
 			}

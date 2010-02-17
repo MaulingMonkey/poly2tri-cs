@@ -29,114 +29,84 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System;
+/// Changes from the Java version
+///   Removed BST code, but not all artifacts of it
+/// Future possibilities
+///   Eliminate Add/RemoveNode ?
+///   Comments comments and more comments!
+
 using System.Text;
 
 namespace Poly2Tri {
-
-
 	/**
 	 * @author Thomas Åhlen (thahlen@gmail.com)
 	 */
 	public class AdvancingFront {
-		public AdvancingFrontNode head;
-		public AdvancingFrontNode tail;
-		protected AdvancingFrontNode search;
+		public AdvancingFrontNode Head;
+		public AdvancingFrontNode Tail;
+		protected AdvancingFrontNode Search;
 
-		protected RedBlackBST<double, AdvancingFrontNode> _searchTree = new RedBlackBST<double, AdvancingFrontNode>(RedBlackBST<double, AdvancingFrontNode>.BU23);
-
-		public AdvancingFront(AdvancingFrontNode head, AdvancingFrontNode tail) {
-			this.head = head;
-			this.tail = tail;
-			this.search = head;
-			addNode(head);
-			addNode(tail);
+		public AdvancingFront( AdvancingFrontNode head, AdvancingFrontNode tail ) {
+			this.Head = head;
+			this.Tail = tail;
+			this.Search = head;
+			AddNode(head);
+			AddNode(tail);
 		}
 
-		public void addNode(AdvancingFrontNode node) {
-			//        _searchTree.put( node.key, node );
-		}
-
-		public void removeNode(AdvancingFrontNode node) {
-			//        _searchTree.delete( node.key );
-		}
+		public void AddNode( AdvancingFrontNode node ) { }
+		public void RemoveNode( AdvancingFrontNode node ) { }
 
 		public override string ToString() {
 			StringBuilder sb = new StringBuilder();
-			AdvancingFrontNode node = head;
-			while (node != tail) {
+			AdvancingFrontNode node = Head;
+			while (node != Tail) {
 				sb.Append(node.point.getX()).Append("->");
 				node = node.next;
 			}
-			sb.Append(tail.point.getX());
+			sb.Append(Tail.point.getX());
 			return sb.ToString();
 		}
 
-		private AdvancingFrontNode findSearchNode(double x) {
-			// TODO: implement BST index 
-			return search;
+		/// <summary>
+		/// MM:  This seems to be used by LocateNode to guess a position in the implicit linked list of AdvancingFrontNodes near x
+		///      Removed an overload that depended on this being exact
+		/// </summary>
+		private AdvancingFrontNode FindSearchNode( double x ) {
+			return Search;
 		}
 
-		/**
-		 * We use a balancing tree to locate a node smaller or equal to
-		 * given key value
-		 * 
-		 * @param x
-		 * @return
-		 */
-		public AdvancingFrontNode locateNode(TriangulationPoint point) {
-			//        Console.WriteLine( this._searchTree );
-			//        Console.WriteLine( this );
-
-			//        AdvancingFrontNode node1, node2;
-			//        node1 = locateNode( point.getX() );
-			//        Console.WriteLine( "1-locateNode[p,np]=[" + point.getX() + "," + node1.point.getX() + "]" );
-			return locateNode(point.getX());
-			//        search = _searchTree.findLowerOrEqual( point.getX() );        
-			//        return search;
-			//        node2 = locateNode( Double.valueOf( point.getX() ) );
-			////        Console.WriteLine( "2-locateNode[p,np]=[" + point.getX() + "," + node2.point.getX() + "]" );
-			//        return node2;
-
-			//        search = _searchTree.findLowerOrEqual( point.getX() );        
-			//        return search;
+		/// <summary>
+		/// We use a balancing tree to locate a node smaller or equal to given key value (in theory)
+		/// </summary>
+		public AdvancingFrontNode LocateNode( TriangulationPoint point ) {
+			return LocateNode(point.getX());
 		}
 
-		private AdvancingFrontNode locateNode(object key) {
-			search = _searchTree.findLowerOrEqual((double)key);
-			return search;
-		}
-
-		private AdvancingFrontNode locateNode(double x) {
-			AdvancingFrontNode node = findSearchNode(x);
+		private AdvancingFrontNode LocateNode( double x ) {
+			AdvancingFrontNode node = FindSearchNode(x);
 			if (x < node.value) {
-				while ((node = node.prev) != null) {
+				while ((node = node.prev) != null)
 					if (x >= node.value) {
-						search = node;
+						Search = node;
 						return node;
 					}
-				}
 			} else {
-				while ((node = node.next) != null) {
+				while ((node = node.next) != null)
 					if (x < node.value) {
-						search = node.prev;
+						Search = node.prev;
 						return node.prev;
 					}
-				}
 			}
 			return null;
 		}
 
-		/**
-		 * This implementation will use simple node traversal algorithm to find
-		 * a point on the front
-		 * 
-		 * @param point
-		 * @return
-		 */
-		public AdvancingFrontNode locatePoint(TriangulationPoint point) {
+		/// <summary>
+		/// This implementation will use simple node traversal algorithm to find a point on the front
+		/// </summary>
+		public AdvancingFrontNode LocatePoint( TriangulationPoint point ) {
 			double px = point.getX();
-			AdvancingFrontNode node = findSearchNode(px);
+			AdvancingFrontNode node = FindSearchNode(px);
 			double nx = node.point.getX();
 
 			if (px == nx) {
@@ -148,23 +118,14 @@ namespace Poly2Tri {
 						node = node.next;
 					} else {
 						throw new RuntimeException("Failed to find Node for given afront point");
-						//                    node = null;
 					}
 				}
 			} else if (px < nx) {
-				while ((node = node.prev) != null) {
-					if (point == node.point) {
-						break;
-					}
-				}
+				while ((node = node.prev) != null) if (point == node.point) break;
 			} else {
-				while ((node = node.next) != null) {
-					if (point == node.point) {
-						break;
-					}
-				}
+				while ((node = node.next) != null) if (point == node.point) break;
 			}
-			search = node;
+			Search = node;
 			return node;
 		}
 	}
