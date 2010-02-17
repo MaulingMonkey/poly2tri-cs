@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using Poly2Tri;
-using System.Drawing;
-using System.IO;
 
 namespace SwfTest {
-	[System.ComponentModel.DesignerCategory("")]
-	class TestForm : Form {
+	[System.ComponentModel.DesignerCategory("")] class TestForm : Form {
 		Polygon Monkey;
 
 		public TestForm() {
@@ -24,32 +23,23 @@ namespace SwfTest {
 				monkeydata.Add(new PointF(float.Parse(xy[0]), float.Parse(xy[1])));
 			}
 
-			Monkey = new Polygon(new ArrayList<PolygonPoint>(monkeydata.Select(p => new PolygonPoint(p.X, p.Y))));
+			Monkey = new Polygon(monkeydata.Select(p => new PolygonPoint(p.X, p.Y)));
 			Poly2Tri.Poly2Tri.Triangulate(Monkey);
 		}
 
-		protected override void OnPaint(PaintEventArgs e) {
+		protected override void OnPaint( PaintEventArgs e ) {
 			var fx = e.Graphics;
 			fx.TranslateTransform(500, 500);
 			fx.ScaleTransform(1, -1);
-			foreach ( var tri in Monkey.Triangles ) {
-				fx.DrawLines(Pens.Green, new PointF[]
-					{ new PointF(5*tri.points[0].Xf,5*tri.points[0].Yf)
-					, new PointF(5*tri.points[1].Xf,5*tri.points[1].Yf)
-					, new PointF(5*tri.points[2].Xf,5*tri.points[2].Yf)
-					, new PointF(5*tri.points[0].Xf,5*tri.points[0].Yf)
-					});
-			}
+			foreach ( var tri in Monkey.Triangles ) fx.DrawPolygon(Pens.Green, new PointF[]
+				{ new PointF(5*tri.points[0].Xf,5*tri.points[0].Yf)
+				, new PointF(5*tri.points[1].Xf,5*tri.points[1].Yf)
+				, new PointF(5*tri.points[2].Xf,5*tri.points[2].Yf)
+				});
 			base.OnPaint(e);
 		}
-	}
 
-	static class Program {
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		[STAThread]
-		static void Main() {
+		[STAThread] static void Main() {
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new TestForm());
