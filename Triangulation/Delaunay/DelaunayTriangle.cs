@@ -40,10 +40,12 @@
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace Poly2Tri {
 	public class DelaunayTriangle {
-		public struct FixedArray3<T> where T:class {
+		public struct FixedArray3<T> : IEnumerable<T> where T:class {
 			public T _0, _1, _2;
 			public T this[ int index ] { get {
 				switch ( index ) {
@@ -74,6 +76,12 @@ namespace Poly2Tri {
 			public void Clear( T value ) {
 				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) this[i] = null;
 			}
+
+			private IEnumerable<T> Enumerate() {
+				for ( int i=0 ; i<3 ; ++i ) yield return this[i];
+			}
+			public IEnumerator<T> GetEnumerator() { return Enumerate().GetEnumerator(); }
+			IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
 		}
 
 		public FixedArray3<TriangulationPoint> Points;
