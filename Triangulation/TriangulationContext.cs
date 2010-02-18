@@ -83,7 +83,7 @@ namespace Poly2Tri {
 		public virtual void Clear() {
 			_points.clear();
 			if (_debug != null) {
-				_debug.clear();
+				_debug.Clear();
 			}
 			_stepCount = 0;
 		}

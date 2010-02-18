@@ -11,6 +11,6 @@ namespace Poly2Tri {
 			_tcx = tcx;
 		}
 
-		public abstract void clear();
+		public abstract void Clear();
 	}
 }

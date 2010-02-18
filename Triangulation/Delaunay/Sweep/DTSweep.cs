@@ -102,7 +102,7 @@ namespace Poly2Tri {
 				node = PointEvent(tcx, point);
 
 				if (point.hasEdges()) foreach (DTSweepConstraint e in point.getEdges()) {
-					if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setActiveConstraint(e);
+					if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveConstraint = e;
 					EdgeEvent(tcx, e, node);
 				}
 				tcx.update(null);
@@ -156,7 +156,7 @@ namespace Poly2Tri {
 		private static void TurnAdvancingFrontConvex( DTSweepContext tcx, AdvancingFrontNode b, AdvancingFrontNode c ) {
 			AdvancingFrontNode first = b;
 			while (c != tcx.Front.Tail) {
-				if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setActiveNode(c);
+				if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = c;
 
 				if (TriangulationUtil.orient2d(b.Point, c.Point, c.Next.Point) == Orientation.CCW) {
 					// [b,c,d] Concave - fill around c
@@ -196,7 +196,7 @@ namespace Poly2Tri {
 			AdvancingFrontNode node, newNode;
 
 			node = tcx.LocateNode(point);
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setActiveNode(node);
+			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
 			newNode = NewFrontTriangle(tcx, point, node);
 
 			// Only need to check +epsilon since point never have smaller 
@@ -228,7 +228,7 @@ namespace Poly2Tri {
 
 			tcx.AddNode(newNode); // XXX: BST
 
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setActiveNode(newNode);
+			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = newNode;
 
 			if (!Legalize(tcx, triangle)) tcx.MapTriangleToNodes(triangle);
 
@@ -240,7 +240,7 @@ namespace Poly2Tri {
 				tcx.EdgeEvent.constrainedEdge = edge;
 				tcx.EdgeEvent.right = edge.p.X > edge.q.X;
 
-				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().setPrimaryTriangle(node.Triangle); }
+				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().PrimaryTriangle = node.Triangle; }
 
 				if (IsEdgeSideOfTriangle(node.Triangle, edge.p, edge.q)) return;
 
@@ -297,7 +297,7 @@ namespace Poly2Tri {
 		}
 
 		private static void FillRightBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setActiveNode(node);
+			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
 
 			if (node.Point.X < edge.p.X) { // needed?
 				if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
@@ -315,7 +315,7 @@ namespace Poly2Tri {
 
 		private static void FillRightAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			while (node.Next.Point.X < edge.p.X) {
-				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().setActiveNode(node); }
+				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().ActiveNode = node; }
 				// Check if next node is below the edge
 				Orientation o1 = TriangulationUtil.orient2d(edge.q, node.Next.Point, edge.p);
 				if (o1 == Orientation.CCW) {
@@ -360,7 +360,7 @@ namespace Poly2Tri {
 		}
 
 		private static void FillLeftBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setActiveNode(node);
+			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
 
 			if (node.Point.X > edge.p.X) {
 				if (TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
@@ -378,7 +378,7 @@ namespace Poly2Tri {
 
 		private static void FillLeftAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			while (node.Prev.Point.X > edge.p.X) {
-				if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setActiveNode(node);
+				if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
 				// Check if next node is below the edge
 				Orientation o1 = TriangulationUtil.orient2d(edge.q, node.Prev.Point, edge.p);
 				if (o1 == Orientation.CW) {
@@ -401,7 +401,7 @@ namespace Poly2Tri {
 		private static void EdgeEvent( DTSweepContext tcx, TriangulationPoint ep, TriangulationPoint eq, DelaunayTriangle triangle, TriangulationPoint point ) {
 			TriangulationPoint p1, p2;
 
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().setPrimaryTriangle(triangle);
+			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().PrimaryTriangle=triangle;
 
 			if (IsEdgeSideOfTriangle(triangle, ep, eq)) return;
 
@@ -477,8 +477,8 @@ namespace Poly2Tri {
 			}
 
 			if (tcx.IsDebugEnabled) {
-				tcx.getDebugContextAsDT().setPrimaryTriangle(t);
-				tcx.getDebugContextAsDT().setSecondaryTriangle(ot);
+				tcx.getDebugContextAsDT().PrimaryTriangle   = t;
+				tcx.getDebugContextAsDT().SecondaryTriangle = ot;
 			} // TODO: remove
 
 			bool inScanArea = TriangulationUtil.inScanArea(p, t.pointCCW(p), t.pointCW(p), op);
@@ -588,8 +588,8 @@ namespace Poly2Tri {
 
 			if (tcx.IsDebugEnabled) {
 				Console.WriteLine("[FLIP:SCAN] - scan next point"); // TODO: remove
-				tcx.getDebugContextAsDT().setPrimaryTriangle(t);
-				tcx.getDebugContextAsDT().setSecondaryTriangle(ot);
+				tcx.getDebugContextAsDT().PrimaryTriangle = t;
+				tcx.getDebugContextAsDT().SecondaryTriangle = ot;
 			}
 
 			inScanArea = TriangulationUtil.inScanArea(eq, flipTriangle.pointCCW(eq), flipTriangle.pointCW(eq), op);
