@@ -78,14 +78,14 @@ namespace Poly2Tri {
 		}
 
 		private void MeshCleanReq( DelaunayTriangle triangle ) {
-			if (triangle != null && !triangle.isInterior()) {
-				triangle.isInterior(true);
+			if (triangle != null && !triangle.IsInterior) {
+				triangle.IsInterior = true;
 				_triUnit.AddTriangle(triangle);
 
 				for (int i = 0; i < 3; i++)
-				if (!triangle.cEdge[i])
+				if (!triangle.EdgeIsConstrained[i])
 				{
-					MeshCleanReq(triangle.neighbors[i]);
+					MeshCleanReq(triangle.Neighbors[i]);
 				}
 			}
 		}
@@ -117,11 +117,11 @@ namespace Poly2Tri {
 			DelaunayTriangle iTriangle = new DelaunayTriangle(_points.get(0), Tail, Head);
 			addToList(iTriangle);
 
-			head = new AdvancingFrontNode(iTriangle.points[1]);
+			head = new AdvancingFrontNode(iTriangle.Points[1]);
 			head.Triangle = iTriangle;
-			middle = new AdvancingFrontNode(iTriangle.points[0]);
+			middle = new AdvancingFrontNode(iTriangle.Points[0]);
 			middle.Triangle = iTriangle;
-			tail = new AdvancingFrontNode(iTriangle.points[2]);
+			tail = new AdvancingFrontNode(iTriangle.Points[2]);
 
 			Front = new AdvancingFront(head, tail);
 			Front.AddNode(middle);
@@ -144,9 +144,9 @@ namespace Poly2Tri {
 		/// </summary>
 		public void MapTriangleToNodes( DelaunayTriangle t ) {
 			for (int i = 0; i < 3; i++)
-			if (t.neighbors[i] == null)
+			if (t.Neighbors[i] == null)
 			{
-				AdvancingFrontNode n = Front.LocatePoint(t.pointCW(t.points[i]));
+				AdvancingFrontNode n = Front.LocatePoint(t.PointCWFrom(t.Points[i]));
 				if (n != null) n.Triangle = t;
 			}
 		}

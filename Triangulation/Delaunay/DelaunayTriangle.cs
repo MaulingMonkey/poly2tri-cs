@@ -29,42 +29,45 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using boolean = System.Boolean;
-using System.Diagnostics;
+/// Changes from the Java version
+///   attributification
+/// Future possibilities
+///   Flattening out the number of indirections
+///     Replacing arrays of 3 with fixed-length arrays?
+///     Replacing bool[3] with a bit array of some sort?
+///     Bundling everything into an AoS mess?
+///     Hardcode them all as ABC ?
+
 using System;
+using System.Diagnostics;
 
 namespace Poly2Tri {
 	public class DelaunayTriangle {
-		/** Neighbor pointers */
-		public readonly DelaunayTriangle[] neighbors = new DelaunayTriangle[3];
-		/** Flags to determine if an edge is a Constrained edge */
-		public readonly boolean[] cEdge = new boolean[] { false, false, false };
-		/** Flags to determine if an edge is a Delauney edge */
-		public readonly boolean[] dEdge = new boolean[] { false, false, false };
-		/** Has this triangle been marked as an interior triangle? */
-		protected boolean interior = false;
-
-		public TriangulationPoint[] points = new TriangulationPoint[3];
+		public readonly TriangulationPoint[] Points = new TriangulationPoint[3];
+		public readonly DelaunayTriangle[] Neighbors = new DelaunayTriangle[3];
+		public readonly bool[] EdgeIsConstrained = new bool[] { false, false, false };
+		public readonly bool[] EdgeIsDelauney    = new bool[] { false, false, false };
+		public bool IsInterior { get; set; }
 
 		public DelaunayTriangle(TriangulationPoint p1, TriangulationPoint p2, TriangulationPoint p3) {
-			points[0] = p1;
-			points[1] = p2;
-			points[2] = p3;
+			Points[0] = p1;
+			Points[1] = p2;
+			Points[2] = p3;
 		}
 
-		public int index(TriangulationPoint p) {
-			if (p == points[0]) {
+		public int IndexOf(TriangulationPoint p) {
+			if (p == Points[0]) {
 				return 0;
-			} else if (p == points[1]) {
+			} else if (p == Points[1]) {
 				return 1;
-			} else if (p == points[2]) {
+			} else if (p == Points[2]) {
 				return 2;
 			}
 			throw new RuntimeException("Calling index with a point that doesn't exist in triangle");
 		}
 
-		public int indexCW(TriangulationPoint p) {
-			int i = index(p);
+		public int IndexCWFrom(TriangulationPoint p) {
+			int i = IndexOf(p);
 			switch (i) {
 			case 0: return 2;
 			case 1: return 0;
@@ -72,8 +75,8 @@ namespace Poly2Tri {
 			}
 		}
 
-		public int indexCCW(TriangulationPoint p) {
-			int i = index(p);
+		public int IndexCCWFrom(TriangulationPoint p) {
+			int i = IndexOf(p);
 			switch (i) {
 			case 0: return 1;
 			case 1: return 2;
@@ -81,244 +84,208 @@ namespace Poly2Tri {
 			}
 		}
 
-		public boolean contains(TriangulationPoint p) {
-			return (p == points[0] || p == points[1] || p == points[2]);
+		public bool Contains(TriangulationPoint p) {
+			return (p == Points[0] || p == Points[1] || p == Points[2]);
 		}
 
-		public boolean contains(DTSweepConstraint e) {
-			return (contains(e.p) && contains(e.q));
+		public bool Contains(DTSweepConstraint e) {
+			return (Contains(e.p) && Contains(e.q));
 		}
 
-		public boolean contains(TriangulationPoint p, TriangulationPoint q) {
-			return (contains(p) && contains(q));
+		public bool Contains(TriangulationPoint p, TriangulationPoint q) {
+			return (Contains(p) && Contains(q));
 		}
 
-		// Update neighbor pointers
-		private void markNeighbor(TriangulationPoint p1,
-								   TriangulationPoint p2,
-								   DelaunayTriangle t) {
-			if ((p1 == points[2] && p2 == points[1]) || (p1 == points[1] && p2 == points[2])) {
-				neighbors[0] = t;
-			} else if ((p1 == points[0] && p2 == points[2]) || (p1 == points[2] && p2 == points[0])) {
-				neighbors[1] = t;
-			} else if ((p1 == points[0] && p2 == points[1]) || (p1 == points[1] && p2 == points[0])) {
-				neighbors[2] = t;
+		/// <summary>
+		/// Update neighbor pointers
+		/// </summary>
+		/// <param name="p1">Point 1 of the shared edge</param>
+		/// <param name="p2">Point 2 of the shared edge</param>
+		/// <param name="t">This triangle's new neighbor</param>
+		private void MarkNeighbor( TriangulationPoint p1, TriangulationPoint p2, DelaunayTriangle t ) {
+			if ((p1 == Points[2] && p2 == Points[1]) || (p1 == Points[1] && p2 == Points[2])) {
+				Neighbors[0] = t;
+			} else if ((p1 == Points[0] && p2 == Points[2]) || (p1 == Points[2] && p2 == Points[0])) {
+				Neighbors[1] = t;
+			} else if ((p1 == Points[0] && p2 == Points[1]) || (p1 == Points[1] && p2 == Points[0])) {
+				Neighbors[2] = t;
 			} else {
 				//logger.error( "Neighbor error, please report!" );
 				// throw new Exception("Neighbor error, please report!");
 			}
 		}
 
-		/* Exhaustive search to update neighbor pointers */
-		public void markNeighbor(DelaunayTriangle t) {
-			if (t.contains(points[1], points[2])) {
-				neighbors[0] = t;
-				t.markNeighbor(points[1], points[2], this);
-			} else if (t.contains(points[0], points[2])) {
-				neighbors[1] = t;
-				t.markNeighbor(points[0], points[2], this);
-			} else if (t.contains(points[0], points[1])) {
-				neighbors[2] = t;
-				t.markNeighbor(points[0], points[1], this);
+		/// <summary>
+		/// Exhaustive search to update neighbor pointers
+		/// </summary>
+		public void MarkNeighbor( DelaunayTriangle t ) {
+			if (t.Contains(Points[1], Points[2])) {
+				Neighbors[0] = t;
+				t.MarkNeighbor(Points[1], Points[2], this);
+			} else if (t.Contains(Points[0], Points[2])) {
+				Neighbors[1] = t;
+				t.MarkNeighbor(Points[0], Points[2], this);
+			} else if (t.Contains(Points[0], Points[1])) {
+				Neighbors[2] = t;
+				t.MarkNeighbor(Points[0], Points[1], this);
 			} else {
 				//logger.error( "markNeighbor failed" );
 			}
 		}
 
-		public void clearNeighbors() {
-			neighbors[0] = neighbors[1] = neighbors[2] = null;
+		public void ClearNeighbors() {
+			Neighbors[0] = Neighbors[1] = Neighbors[2] = null;
 		}
 
-		public void clearNeighbor(DelaunayTriangle triangle) {
-			if (neighbors[0] == triangle) {
-				neighbors[0] = null;
-			} else if (neighbors[1] == triangle) {
-				neighbors[1] = null;
+		public void ClearNeighbor(DelaunayTriangle triangle) {
+			if (Neighbors[0] == triangle) {
+				Neighbors[0] = null;
+			} else if (Neighbors[1] == triangle) {
+				Neighbors[1] = null;
 			} else {
-				neighbors[2] = null;
+				Neighbors[2] = null;
 			}
 		}
 
-		/**
-		 * @param t - opposite triangle 
-		 * @param p - the point in t that isn't shared between the triangles
-		 * @return
-		 */
-		public TriangulationPoint oppositePoint(DelaunayTriangle t, TriangulationPoint p) {
+		/// <param name="t">Opposite triangle</param>
+		/// <param name="p">The point in t that isn't shared between the triangles</param>
+		public TriangulationPoint OppositePoint(DelaunayTriangle t, TriangulationPoint p) {
 			Debug.Assert(t != this, "self-pointer error");
-			return pointCW(t.pointCW(p));
+			return PointCWFrom(t.PointCWFrom(p));
+		}
+		
+		/// <summary>
+		/// The neighbor clockwise to given point
+		/// </summary>
+		public DelaunayTriangle NeighborCWFrom(TriangulationPoint point) {
+			if (point == Points[0]) {
+				return Neighbors[1];
+			} else if (point == Points[1]) {
+				return Neighbors[2];
+			}
+			return Neighbors[0];
 		}
 
-		// Fast point in triangle test
-		//    public boolean pointIn( TriangulationPoint point )
-		//    {
-		//        double ijx = points[1].X - points[0].X;
-		//        double ijy = points[1].Y - points[0].Y;
-		//        double abx = point.X - points[0].X;
-		//        double aby = point.Y - points[0].Y;
-		//        double pab = abx*ijy - aby*ijx;
-		//
-		//        double jkx = points[2].X - points[1].X;
-		//        double jky = points[2].Y - points[1].Y;
-		//        double bcx = point.X - points[1].X;
-		//        double bcy = point.Y - points[1].Y;
-		//        double pbc = bcx*jky - bcy*jkx;
-		//        boolean sameSign = Math.signum( pab ) == Math.signum( pbc );
-		//        if( !sameSign )
-		//        {
-		//            return false;
-		//        }
-		//
-		//        double kix = points[0].X - points[2].X;
-		//        double kiy = points[0].Y - points[2].Y;
-		//        double cax = point.X - points[2].X;
-		//        double cay = point.Y - points[2].Y;
-		//        double pca = cax*kiy - cay*kix;
-		//        sameSign = Math.signum( pab ) == Math.signum( pca );
-		//        if( !sameSign )
-		//        {
-		//            return false;
-		//        }
-		//        return true;
-		//    }
-
-		// The neighbor clockwise to given point
-		public DelaunayTriangle neighborCW(TriangulationPoint point) {
-			if (point == points[0]) {
-				return neighbors[1];
-			} else if (point == points[1]) {
-				return neighbors[2];
+		/// <summary>
+		/// The neighbor counter-clockwise to given point
+		/// </summary>
+		public DelaunayTriangle NeighborCCWFrom(TriangulationPoint point) {
+			if (point == Points[0]) {
+				return Neighbors[2];
+			} else if (point == Points[1]) {
+				return Neighbors[0];
 			}
-			return neighbors[0];
+			return Neighbors[1];
 		}
 
-		// The neighbor counter-clockwise to given point
-		public DelaunayTriangle neighborCCW(TriangulationPoint point) {
-			if (point == points[0]) {
-				return neighbors[2];
-			} else if (point == points[1]) {
-				return neighbors[0];
+		/// <summary>
+		/// The neighbor across to given point
+		/// </summary>
+		public DelaunayTriangle NeighborAcrossFrom(TriangulationPoint opoint) {
+			if (opoint == Points[0]) {
+				return Neighbors[0];
+			} else if (opoint == Points[1]) {
+				return Neighbors[1];
 			}
-			return neighbors[1];
+			return Neighbors[2];
 		}
 
-		// The neighbor across to given point
-		public DelaunayTriangle neighborAcross(TriangulationPoint opoint) {
-			if (opoint == points[0]) {
-				return neighbors[0];
-			} else if (opoint == points[1]) {
-				return neighbors[1];
+		/// <summary>
+		/// The point counter-clockwise to given point
+		/// </summary>
+		public TriangulationPoint PointCCWFrom(TriangulationPoint point) {
+			if (point == Points[0]) {
+				return Points[1];
+			} else if (point == Points[1]) {
+				return Points[2];
+			} else if (point == Points[2]) {
+				return Points[0];
 			}
-			return neighbors[2];
-		}
-
-		// The point counter-clockwise to given point
-		public TriangulationPoint pointCCW(TriangulationPoint point) {
-			if (point == points[0]) {
-				return points[1];
-			} else if (point == points[1]) {
-				return points[2];
-			} else if (point == points[2]) {
-				return points[0];
-			}
-			//logger.error("point location error");
 			throw new RuntimeException("[FIXME] point location error");
 		}
 
-		// The point counter-clockwise to given point
-		public TriangulationPoint pointCW(TriangulationPoint point) {
-			if (point == points[0]) {
-				return points[2];
-			} else if (point == points[1]) {
-				return points[0];
-			} else if (point == points[2]) {
-				return points[1];
+		/// <summary>
+		/// The point counter-clockwise to given point
+		/// </summary>
+		public TriangulationPoint PointCWFrom(TriangulationPoint point) {
+			if (point == Points[0]) {
+				return Points[2];
+			} else if (point == Points[1]) {
+				return Points[0];
+			} else if (point == Points[2]) {
+				return Points[1];
 			}
-			//logger.error("point location error");
 			throw new RuntimeException("[FIXME] point location error");
 		}
 
-		// Legalize triangle by rotating clockwise around oPoint
-		public void legalize(TriangulationPoint oPoint, TriangulationPoint nPoint) {
-			if (oPoint == points[0]) {
-				points[1] = points[0];
-				points[0] = points[2];
-				points[2] = nPoint;
-			} else if (oPoint == points[1]) {
-				points[2] = points[1];
-				points[1] = points[0];
-				points[0] = nPoint;
-			} else if (oPoint == points[2]) {
-				points[0] = points[2];
-				points[2] = points[1];
-				points[1] = nPoint;
+		/// <summary>
+		/// Legalize triangle by rotating clockwise around oPoint
+		/// </summary>
+		/// <param name="oPoint">The origin point to rotate around</param>
+		/// <param name="nPoint">???</param>
+		public void Legalize(TriangulationPoint oPoint, TriangulationPoint nPoint) {
+			if (oPoint == Points[0]) {
+				Points[1] = Points[0];
+				Points[0] = Points[2];
+				Points[2] = nPoint;
+			} else if (oPoint == Points[1]) {
+				Points[2] = Points[1];
+				Points[1] = Points[0];
+				Points[0] = nPoint;
+			} else if (oPoint == Points[2]) {
+				Points[0] = Points[2];
+				Points[2] = Points[1];
+				Points[1] = nPoint;
 			} else {
 				throw new RuntimeException("legalization bug");
 			}
 		}
 
-		public void printDebug() {
-			System.Console.WriteLine(points[0] + "," + points[1] + "," + points[2]);
+		public override string ToString() { return Points[0] + "," + Points[1] + "," + Points[2]; }
+
+		/// <summary>
+		/// Finalize edge marking
+		/// </summary>
+		public void MarkNeighborEdges() {
+			for (int i = 0; i < 3; i++) if (EdgeIsConstrained[i]) switch (i) {
+			case 0: if (Neighbors[0] != null) Neighbors[0].MarkConstrainedEdge(Points[1], Points[2]); break;
+			case 1: if (Neighbors[1] != null) Neighbors[1].MarkConstrainedEdge(Points[0], Points[2]); break;
+			case 2: if (Neighbors[2] != null) Neighbors[2].MarkConstrainedEdge(Points[0], Points[1]); break;
+			}
 		}
 
-		private void Console(string p) {
-			throw new System.NotImplementedException();
-		}
-
-		// Finalize edge marking
-		public void markNeighborEdges() {
+		public void MarkEdge(DelaunayTriangle triangle) {
 			for (int i = 0; i < 3; i++) {
-				if (cEdge[i]) {
+				if (EdgeIsConstrained[i]) {
 					switch (i) {
 					case 0:
-						if (neighbors[0] != null)
-							neighbors[0].markConstrainedEdge(points[1], points[2]);
+						triangle.MarkConstrainedEdge(Points[1], Points[2]);
 						break;
 					case 1:
-						if (neighbors[1] != null)
-							neighbors[1].markConstrainedEdge(points[0], points[2]);
+						triangle.MarkConstrainedEdge(Points[0], Points[2]);
 						break;
 					case 2:
-						if (neighbors[2] != null)
-							neighbors[2].markConstrainedEdge(points[0], points[1]);
+						triangle.MarkConstrainedEdge(Points[0], Points[1]);
 						break;
 					}
 				}
 			}
 		}
 
-		public void markEdge(DelaunayTriangle triangle) {
-			for (int i = 0; i < 3; i++) {
-				if (cEdge[i]) {
-					switch (i) {
-					case 0:
-						triangle.markConstrainedEdge(points[1], points[2]);
-						break;
-					case 1:
-						triangle.markConstrainedEdge(points[0], points[2]);
-						break;
-					case 2:
-						triangle.markConstrainedEdge(points[0], points[1]);
-						break;
-					}
-				}
-			}
-		}
-
-		public void markEdge(ArrayList<DelaunayTriangle> tList) {
+		public void MarkEdge(ArrayList<DelaunayTriangle> tList) {
 
 			foreach (DelaunayTriangle t in tList) {
 				for (int i = 0; i < 3; i++) {
-					if (t.cEdge[i]) {
+					if (t.EdgeIsConstrained[i]) {
 						switch (i) {
 						case 0:
-							markConstrainedEdge(t.points[1], t.points[2]);
+							MarkConstrainedEdge(t.Points[1], t.Points[2]);
 							break;
 						case 1:
-							markConstrainedEdge(t.points[0], t.points[2]);
+							MarkConstrainedEdge(t.Points[0], t.Points[2]);
 							break;
 						case 2:
-							markConstrainedEdge(t.points[0], t.points[1]);
+							MarkConstrainedEdge(t.Points[0], t.Points[1]);
 							break;
 						}
 					}
@@ -326,242 +293,194 @@ namespace Poly2Tri {
 			}
 		}
 
-		public void markConstrainedEdge(int index) {
-			cEdge[index] = true;
+		public void MarkConstrainedEdge(int index) {
+			EdgeIsConstrained[index] = true;
 		}
 
-		public void markConstrainedEdge(DTSweepConstraint edge) {
-			markConstrainedEdge(edge.p, edge.q);
-			if ((edge.q == points[0] && edge.p == points[1])
-			   || (edge.q == points[1] && edge.p == points[0])) {
-				cEdge[2] = true;
-			} else if ((edge.q == points[0] && edge.p == points[2])
-					|| (edge.q == points[2] && edge.p == points[0])) {
-				cEdge[1] = true;
-			} else if ((edge.q == points[1] && edge.p == points[2])
-					  || (edge.q == points[2] && edge.p == points[1])) {
-				cEdge[0] = true;
+		public void MarkConstrainedEdge(DTSweepConstraint edge) {
+			MarkConstrainedEdge(edge.p, edge.q);
+			if ((edge.q == Points[0] && edge.p == Points[1])
+			   || (edge.q == Points[1] && edge.p == Points[0])) {
+				EdgeIsConstrained[2] = true;
+			} else if ((edge.q == Points[0] && edge.p == Points[2])
+					|| (edge.q == Points[2] && edge.p == Points[0])) {
+				EdgeIsConstrained[1] = true;
+			} else if ((edge.q == Points[1] && edge.p == Points[2])
+					  || (edge.q == Points[2] && edge.p == Points[1])) {
+				EdgeIsConstrained[0] = true;
 			}
 		}
 
 		// Mark edge as constrained
-		public void markConstrainedEdge(TriangulationPoint p, TriangulationPoint q) {
-			if ((q == points[0] && p == points[1]) || (q == points[1] && p == points[0])) {
-				cEdge[2] = true;
-			} else if ((q == points[0] && p == points[2]) || (q == points[2] && p == points[0])) {
-				cEdge[1] = true;
-			} else if ((q == points[1] && p == points[2]) || (q == points[2] && p == points[1])) {
-				cEdge[0] = true;
+		public void MarkConstrainedEdge(TriangulationPoint p, TriangulationPoint q) {
+			if ((q == Points[0] && p == Points[1]) || (q == Points[1] && p == Points[0])) {
+				EdgeIsConstrained[2] = true;
+			} else if ((q == Points[0] && p == Points[2]) || (q == Points[2] && p == Points[0])) {
+				EdgeIsConstrained[1] = true;
+			} else if ((q == Points[1] && p == Points[2]) || (q == Points[2] && p == Points[1])) {
+				EdgeIsConstrained[0] = true;
 			}
 		}
 
-		public double area() {
+		public double Area() {
 
-			double b = points[0].X - points[1].X;
-			double h = points[2].Y - points[1].Y;
+			double b = Points[0].X - Points[1].X;
+			double h = Points[2].Y - Points[1].Y;
 
 			return Math.Abs((b * h * 0.5f));
 		}
 
-		public TriangulationPoint centroid() {
-			double cx = (points[0].X + points[1].X + points[2].X) / 3f;
-			double cy = (points[0].Y + points[1].Y + points[2].Y) / 3f;
+		public TriangulationPoint Centroid() {
+			double cx = (Points[0].X + Points[1].X + Points[2].X) / 3f;
+			double cy = (Points[0].Y + Points[1].Y + Points[2].Y) / 3f;
 			return new TriangulationPoint(cx, cy);
 		}
 
-		//    public boolean thin()
-		//    {
-		//        TriangulationPoint a1 = (TriangulationPoint)points[1].subtract( points[0], null );
-		//        TriangulationPoint b1 = (TriangulationPoint)points[2].subtract( points[0], null );
-		//        TriangulationPoint a2 = (TriangulationPoint)points[0].subtract( points[1], null );
-		//        TriangulationPoint b2 = (TriangulationPoint)points[2].subtract( points[1], null );
-		//        double angle1 = Math.abs( Math.atan2( a1.cross( b1 ), a1.dot( b1 ) ) );
-		//        double angle2 = Math.abs( Math.atan2( a2.cross( b2 ), a2.dot( b2 ) ) );
-		//        double angle3 = Math.PI - angle1 - angle2;
-		//        logger.info( "tri angles[{},{},{}]", new Object[]{ Math.toDegrees( angle1 ),  Math.toDegrees( angle2 ),  Math.toDegrees( angle3 ) } );
-		//        // 30 degrees
-		//        double minAngle = Math.PI / 6;
-		//        return ( angle1 <= minAngle || angle2 <= minAngle || angle3 <= minAngle );
-		//    }
-
-		// Compute barycentric coordinates (u, v, w) for
-		// point p with respect to triangle
-		// From "Real-Time Collision Detection" by Christer Ericson
-		//    public double[] barycentric( TriangulationPoint p )
-		//    {
-		//        double v0x = points[1].X - points[0].X;
-		//        double v0y = points[1].Y - points[0].Y;
-		//        double v1x = points[2].X - points[0].X;
-		//        double v1y = points[2].Y - points[0].Y;
-		//        double v2x = p.X - points[0].X;
-		//        double v2y = p.Y - points[0].Y;
-		//        double d00 = v0x*v0x + v0y*v0y;
-		//        double d01 = v0x*v1x + v0y*v1y;
-		//        double d11 = v1x*v1x + v1y*v1y;
-		//        double d20 = v2x*v0x + v2y*v0y;
-		//        double d21 = v2x*v1x + v2y*v1y;
-		//        double denom = d00 * d11 - d01 * d01;
-		//        double v = ( d11 * d20 - d01 * d21 ) / denom;
-		//        double w = ( d00 * d21 - d01 * d20 ) / denom;
-		//        double u = 1.0f - v - w;
-		//        return new double[] { u, v, w };
-		//    }
-
-		/**
-		 * Get the neighbor that share this edge
-		 * 
-		 * @param constrainedEdge
-		 * @return index of the shared edge or -1 if edge isn't shared
-		 */
-		public int edgeIndex(TriangulationPoint p1, TriangulationPoint p2) {
-			if (points[0] == p1) {
-				if (points[1] == p2) {
+		/// <summary>
+		/// Get the index of the neighbor that shares this edge (or -1 if it isn't shared)
+		/// </summary>
+		/// <returns>index of the shared edge or -1 if edge isn't shared</returns>
+		public int EdgeIndex(TriangulationPoint p1, TriangulationPoint p2) {
+			if (Points[0] == p1) {
+				if (Points[1] == p2) {
 					return 2;
-				} else if (points[2] == p2) {
+				} else if (Points[2] == p2) {
 					return 1;
 				}
-			} else if (points[1] == p1) {
-				if (points[2] == p2) {
+			} else if (Points[1] == p1) {
+				if (Points[2] == p2) {
 					return 0;
-				} else if (points[0] == p2) {
+				} else if (Points[0] == p2) {
 					return 2;
 				}
-			} else if (points[2] == p1) {
-				if (points[0] == p2) {
+			} else if (Points[2] == p1) {
+				if (Points[0] == p2) {
 					return 1;
-				} else if (points[1] == p2) {
+				} else if (Points[1] == p2) {
 					return 0;
 				}
 			}
 			return -1;
 		}
 
-		public boolean getConstrainedEdgeCCW(TriangulationPoint p) {
-			if (p == points[0]) {
-				return cEdge[2];
-			} else if (p == points[1]) {
-				return cEdge[0];
+		public bool GetConstrainedEdgeCCW(TriangulationPoint p) {
+			if (p == Points[0]) {
+				return EdgeIsConstrained[2];
+			} else if (p == Points[1]) {
+				return EdgeIsConstrained[0];
 			}
-			return cEdge[1];
+			return EdgeIsConstrained[1];
 		}
 
-		public boolean getConstrainedEdgeCW(TriangulationPoint p) {
-			if (p == points[0]) {
-				return cEdge[1];
-			} else if (p == points[1]) {
-				return cEdge[2];
+		public bool GetConstrainedEdgeCW(TriangulationPoint p) {
+			if (p == Points[0]) {
+				return EdgeIsConstrained[1];
+			} else if (p == Points[1]) {
+				return EdgeIsConstrained[2];
 			}
-			return cEdge[0];
+			return EdgeIsConstrained[0];
 		}
 
-		public boolean getConstrainedEdgeAcross(TriangulationPoint p) {
-			if (p == points[0]) {
-				return cEdge[0];
-			} else if (p == points[1]) {
-				return cEdge[1];
+		public bool GetConstrainedEdgeAcross(TriangulationPoint p) {
+			if (p == Points[0]) {
+				return EdgeIsConstrained[0];
+			} else if (p == Points[1]) {
+				return EdgeIsConstrained[1];
 			}
-			return cEdge[2];
+			return EdgeIsConstrained[2];
 		}
 
-		public void setConstrainedEdgeCCW(TriangulationPoint p, boolean ce) {
-			if (p == points[0]) {
-				cEdge[2] = ce;
-			} else if (p == points[1]) {
-				cEdge[0] = ce;
+		public void SetConstrainedEdgeCCW(TriangulationPoint p, bool ce) {
+			if (p == Points[0]) {
+				EdgeIsConstrained[2] = ce;
+			} else if (p == Points[1]) {
+				EdgeIsConstrained[0] = ce;
 			} else {
-				cEdge[1] = ce;
+				EdgeIsConstrained[1] = ce;
 			}
 		}
 
-		public void setConstrainedEdgeCW(TriangulationPoint p, boolean ce) {
-			if (p == points[0]) {
-				cEdge[1] = ce;
-			} else if (p == points[1]) {
-				cEdge[2] = ce;
+		public void SetConstrainedEdgeCW(TriangulationPoint p, bool ce) {
+			if (p == Points[0]) {
+				EdgeIsConstrained[1] = ce;
+			} else if (p == Points[1]) {
+				EdgeIsConstrained[2] = ce;
 			} else {
-				cEdge[0] = ce;
+				EdgeIsConstrained[0] = ce;
 			}
 		}
 
-		public void setConstrainedEdgeAcross(TriangulationPoint p, boolean ce) {
-			if (p == points[0]) {
-				cEdge[0] = ce;
-			} else if (p == points[1]) {
-				cEdge[1] = ce;
+		public void SetConstrainedEdgeAcross(TriangulationPoint p, bool ce) {
+			if (p == Points[0]) {
+				EdgeIsConstrained[0] = ce;
+			} else if (p == Points[1]) {
+				EdgeIsConstrained[1] = ce;
 			} else {
-				cEdge[2] = ce;
+				EdgeIsConstrained[2] = ce;
 			}
 		}
 
-		public boolean getDelunayEdgeCCW(TriangulationPoint p) {
-			if (p == points[0]) {
-				return dEdge[2];
-			} else if (p == points[1]) {
-				return dEdge[0];
+		public bool GetDelunayEdgeCCW(TriangulationPoint p) {
+			if (p == Points[0]) {
+				return EdgeIsDelauney[2];
+			} else if (p == Points[1]) {
+				return EdgeIsDelauney[0];
 			}
-			return dEdge[1];
+			return EdgeIsDelauney[1];
 		}
 
-		public boolean getDelunayEdgeCW(TriangulationPoint p) {
-			if (p == points[0]) {
-				return dEdge[1];
-			} else if (p == points[1]) {
-				return dEdge[2];
+		public bool GetDelunayEdgeCW(TriangulationPoint p) {
+			if (p == Points[0]) {
+				return EdgeIsDelauney[1];
+			} else if (p == Points[1]) {
+				return EdgeIsDelauney[2];
 			}
-			return dEdge[0];
+			return EdgeIsDelauney[0];
 		}
 
-		public boolean getDelunayEdgeAcross(TriangulationPoint p) {
-			if (p == points[0]) {
-				return dEdge[0];
-			} else if (p == points[1]) {
-				return dEdge[1];
+		public bool GetDelunayEdgeAcross(TriangulationPoint p) {
+			if (p == Points[0]) {
+				return EdgeIsDelauney[0];
+			} else if (p == Points[1]) {
+				return EdgeIsDelauney[1];
 			}
-			return dEdge[2];
+			return EdgeIsDelauney[2];
 		}
 
-		public void setDelunayEdgeCCW(TriangulationPoint p, boolean e) {
-			if (p == points[0]) {
-				dEdge[2] = e;
-			} else if (p == points[1]) {
-				dEdge[0] = e;
+		public void SetDelunayEdgeCCW(TriangulationPoint p, bool e) {
+			if (p == Points[0]) {
+				EdgeIsDelauney[2] = e;
+			} else if (p == Points[1]) {
+				EdgeIsDelauney[0] = e;
 			} else {
-				dEdge[1] = e;
+				EdgeIsDelauney[1] = e;
 			}
 		}
 
-		public void setDelunayEdgeCW(TriangulationPoint p, boolean e) {
-			if (p == points[0]) {
-				dEdge[1] = e;
-			} else if (p == points[1]) {
-				dEdge[2] = e;
+		public void SetDelunayEdgeCW(TriangulationPoint p, bool e) {
+			if (p == Points[0]) {
+				EdgeIsDelauney[1] = e;
+			} else if (p == Points[1]) {
+				EdgeIsDelauney[2] = e;
 			} else {
-				dEdge[0] = e;
+				EdgeIsDelauney[0] = e;
 			}
 		}
 
-		public void setDelunayEdgeAcross(TriangulationPoint p, boolean e) {
-			if (p == points[0]) {
-				dEdge[0] = e;
-			} else if (p == points[1]) {
-				dEdge[1] = e;
+		public void SetDelunayEdgeAcross(TriangulationPoint p, bool e) {
+			if (p == Points[0]) {
+				EdgeIsDelauney[0] = e;
+			} else if (p == Points[1]) {
+				EdgeIsDelauney[1] = e;
 			} else {
-				dEdge[2] = e;
+				EdgeIsDelauney[2] = e;
 			}
 		}
 
-		public void clearDelunayEdges() {
-			dEdge[0] = false;
-			dEdge[1] = false;
-			dEdge[2] = false;
-		}
-
-		public boolean isInterior() {
-			return interior;
-		}
-
-		public void isInterior(boolean b) {
-			interior = b;
+		public void ClearDelunayEdges() {
+			EdgeIsDelauney[0] = false;
+			EdgeIsDelauney[1] = false;
+			EdgeIsDelauney[2] = false;
 		}
 	}
 }

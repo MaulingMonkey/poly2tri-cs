@@ -132,19 +132,19 @@ namespace Poly2Tri {
 			p1 = n2.Point;
 			do {
 				tcx.RemoveFromList(t1);
-				p1 = t1.pointCCW(p1);
+				p1 = t1.PointCCWFrom(p1);
 				if (p1 == first) break;
-				t1 = t1.neighborCCW(p1);
+				t1 = t1.NeighborCCWFrom(p1);
 			} while (true);
 
 			// Lower left boundary
 			first = tcx.Front.Head.Next.Point;
-			p1 = t1.pointCW(tcx.Front.Head.Point);
-			t1 = t1.neighborCW(tcx.Front.Head.Point);
+			p1 = t1.PointCWFrom(tcx.Front.Head.Point);
+			t1 = t1.NeighborCWFrom(tcx.Front.Head.Point);
 			do {
 				tcx.RemoveFromList(t1);
-				p1 = t1.pointCCW(p1);
-				t1 = t1.neighborCCW(p1);
+				p1 = t1.PointCCWFrom(p1);
+				t1 = t1.NeighborCCWFrom(p1);
 			} while (p1 != first);
 
 			tcx.FinalizeTriangulation();
@@ -181,7 +181,7 @@ namespace Poly2Tri {
 			// Get an Internal triangle to start with
 			DelaunayTriangle t = tcx.Front.Head.Next.Triangle;
 			TriangulationPoint p = tcx.Front.Head.Next.Point;
-			while (!t.getConstrainedEdgeCW(p)) t = t.neighborCCW(p);
+			while (!t.GetConstrainedEdgeCW(p)) t = t.NeighborCCWFrom(p);
 
 			// Collect interior triangles constrained by edges
 			tcx.MeshClean(t);
@@ -217,7 +217,7 @@ namespace Poly2Tri {
 			DelaunayTriangle triangle;
 
 			triangle = new DelaunayTriangle(point, node.Point, node.Next.Point);
-			triangle.markNeighbor(node.Triangle);
+			triangle.MarkNeighbor(node.Triangle);
 			tcx.addToList(triangle);
 
 			newNode = new AdvancingFrontNode(point);
@@ -390,11 +390,11 @@ namespace Poly2Tri {
 		}
 
 		private static bool IsEdgeSideOfTriangle( DelaunayTriangle triangle, TriangulationPoint ep, TriangulationPoint eq ) {
-			int index = triangle.edgeIndex(ep, eq);
+			int index = triangle.EdgeIndex(ep, eq);
 			if ( index == -1 ) return false;
-			triangle.markConstrainedEdge(index);
-			triangle = triangle.neighbors[index];
-			if (triangle != null) triangle.markConstrainedEdge(ep, eq);
+			triangle.MarkConstrainedEdge(index);
+			triangle = triangle.Neighbors[index];
+			if (triangle != null) triangle.MarkConstrainedEdge(ep, eq);
 			return true;
 		}
 
@@ -405,7 +405,7 @@ namespace Poly2Tri {
 
 			if (IsEdgeSideOfTriangle(triangle, ep, eq)) return;
 
-			p1 = triangle.pointCCW(point);
+			p1 = triangle.PointCCWFrom(point);
 			Orientation o1 = TriangulationUtil.orient2d(eq, p1, ep);
 			if (o1 == Orientation.Collinear) {
 				// TODO: Split edge in two
@@ -416,7 +416,7 @@ namespace Poly2Tri {
 				throw new PointOnEdgeException("EdgeEvent - Point on constrained edge not supported yet");
 			}
 
-			p2 = triangle.pointCW(point);
+			p2 = triangle.PointCWFrom(point);
 			Orientation o2 = TriangulationUtil.orient2d(eq, p2, ep);
 			if (o2 == Orientation.Collinear) {
 				// TODO: Split edge in two
@@ -430,9 +430,9 @@ namespace Poly2Tri {
 				// Need to decide if we are rotating CW or CCW to get to a triangle
 				// that will cross edge
 				if (o1 == Orientation.CW) {
-					triangle = triangle.neighborCCW(point);
+					triangle = triangle.NeighborCCWFrom(point);
 				} else {
-					triangle = triangle.neighborCW(point);
+					triangle = triangle.NeighborCWFrom(point);
 				}
 				EdgeEvent(tcx, ep, eq, triangle, point);
 			} else {
@@ -467,8 +467,8 @@ namespace Poly2Tri {
 		}
 
 		private static void FlipEdgeEvent( DTSweepContext tcx, TriangulationPoint ep, TriangulationPoint eq, DelaunayTriangle t, TriangulationPoint p ) {
-			DelaunayTriangle ot = t.neighborAcross(p);
-			TriangulationPoint op = ot.oppositePoint(t, p);
+			DelaunayTriangle ot = t.NeighborAcrossFrom(p);
+			TriangulationPoint op = ot.OppositePoint(t, p);
 
 			if (ot == null) {
 				// If we want to integrate the fillEdgeEvent do it here
@@ -481,7 +481,7 @@ namespace Poly2Tri {
 				tcx.getDebugContextAsDT().SecondaryTriangle = ot;
 			} // TODO: remove
 
-			bool inScanArea = TriangulationUtil.inScanArea(p, t.pointCCW(p), t.pointCW(p), op);
+			bool inScanArea = TriangulationUtil.inScanArea(p, t.PointCCWFrom(p), t.PointCWFrom(p), op);
 			if (inScanArea) {
 				// Lets rotate shared edge one vertex CW
 				RotateTrianglePair(t, p, ot, op);
@@ -492,8 +492,8 @@ namespace Poly2Tri {
 					if (eq == tcx.EdgeEvent.ConstrainedEdge.q
 						&& ep == tcx.EdgeEvent.ConstrainedEdge.p) {
 						if (tcx.IsDebugEnabled) Console.WriteLine("[FLIP] - constrained edge done"); // TODO: remove
-						t.markConstrainedEdge(ep, eq);
-						ot.markConstrainedEdge(ep, eq);
+						t.MarkConstrainedEdge(ep, eq);
+						ot.MarkConstrainedEdge(ep, eq);
 						Legalize(tcx, t);
 						Legalize(tcx, ot);
 					} else {
@@ -521,8 +521,8 @@ namespace Poly2Tri {
 		private static TriangulationPoint NextFlipPoint( TriangulationPoint ep, TriangulationPoint eq, DelaunayTriangle ot, TriangulationPoint op ) {
 			Orientation o2d = TriangulationUtil.orient2d(eq, op, ep);
 			switch ( o2d ) {
-			case Orientation.CW: return ot.pointCCW(op);
-			case Orientation.CCW: return ot.pointCW(op);
+			case Orientation.CW: return ot.PointCCWFrom(op);
+			case Orientation.CCW: return ot.PointCWFrom(op);
 			case Orientation.Collinear:
 				// TODO: implement support for point on constraint edge
 				throw new PointOnEdgeException("Point on constrained edge not supported yet");
@@ -546,17 +546,17 @@ namespace Poly2Tri {
 			int edgeIndex;
 			if (o == Orientation.CCW) {
 				// ot is not crossing edge after flip
-				edgeIndex = ot.edgeIndex(p, op);
-				ot.dEdge[edgeIndex] = true;
+				edgeIndex = ot.EdgeIndex(p, op);
+				ot.EdgeIsDelauney[edgeIndex] = true;
 				Legalize(tcx, ot);
-				ot.clearDelunayEdges();
+				ot.ClearDelunayEdges();
 				return t;
 			}
 			// t is not crossing edge after flip
-			edgeIndex = t.edgeIndex(p, op);
-			t.dEdge[edgeIndex] = true;
+			edgeIndex = t.EdgeIndex(p, op);
+			t.EdgeIsDelauney[edgeIndex] = true;
 			Legalize(tcx, t);
-			t.clearDelunayEdges();
+			t.ClearDelunayEdges();
 			return ot;
 		}
 
@@ -577,8 +577,8 @@ namespace Poly2Tri {
 			TriangulationPoint op, newP;
 			bool inScanArea;
 
-			ot = t.neighborAcross(p);
-			op = ot.oppositePoint(t, p);
+			ot = t.NeighborAcrossFrom(p);
+			op = ot.OppositePoint(t, p);
 
 			if (ot == null) {
 				// If we want to integrate the fillEdgeEvent do it here
@@ -592,7 +592,7 @@ namespace Poly2Tri {
 				tcx.getDebugContextAsDT().SecondaryTriangle = ot;
 			}
 
-			inScanArea = TriangulationUtil.inScanArea(eq, flipTriangle.pointCCW(eq), flipTriangle.pointCW(eq), op);
+			inScanArea = TriangulationUtil.inScanArea(eq, flipTriangle.PointCCWFrom(eq), flipTriangle.PointCWFrom(eq), op);
 			if (inScanArea) {
 				// flip with new edge op->eq
 				FlipEdgeEvent(tcx, eq, op, ot, op);
@@ -759,8 +759,8 @@ namespace Poly2Tri {
 			DelaunayTriangle triangle = new DelaunayTriangle(node.Prev.Point, node.Point, node.Next.Point);
 			// TODO: should copy the cEdge value from neighbor triangles
 			//       for now cEdge values are copied during the legalize 
-			triangle.markNeighbor(node.Prev.Triangle);
-			triangle.markNeighbor(node.Triangle);
+			triangle.MarkNeighbor(node.Prev.Triangle);
+			triangle.MarkNeighbor(node.Triangle);
 			tcx.addToList(triangle);
 
 			// Update the advancing front
@@ -781,26 +781,26 @@ namespace Poly2Tri {
 			for (int i = 0; i < 3; i++) {
 				// TODO: fix so that cEdge is always valid when creating new triangles then we can check it here
 				//       instead of below with ot
-				if (t.dEdge[i]) continue;
+				if (t.EdgeIsDelauney[i]) continue;
 
-				DelaunayTriangle ot = t.neighbors[i];
+				DelaunayTriangle ot = t.Neighbors[i];
 				if (ot == null) continue;
 
-				TriangulationPoint p = t.points[i];
-				TriangulationPoint op = ot.oppositePoint(t, p);
-				int oi = ot.index(op);
+				TriangulationPoint p = t.Points[i];
+				TriangulationPoint op = ot.OppositePoint(t, p);
+				int oi = ot.IndexOf(op);
 				// If this is a Constrained Edge or a Delaunay Edge(only during recursive legalization)
 				// then we should not try to legalize
-				if (ot.cEdge[oi] || ot.dEdge[oi]) {
-					t.cEdge[i] = ot.cEdge[oi]; // XXX: have no good way of setting this property when creating new triangles so lets set it here
+				if (ot.EdgeIsConstrained[oi] || ot.EdgeIsDelauney[oi]) {
+					t.EdgeIsConstrained[i] = ot.EdgeIsConstrained[oi]; // XXX: have no good way of setting this property when creating new triangles so lets set it here
 					continue;
 				}
 
-				if (!TriangulationUtil.smartIncircle(p,t.pointCCW(p),t.pointCW(p),op)) continue;
+				if (!TriangulationUtil.smartIncircle(p,t.PointCCWFrom(p),t.PointCWFrom(p),op)) continue;
 
 				// Lets mark this shared edge as Delaunay 
-				t.dEdge[i] = true;
-				ot.dEdge[oi] = true;
+				t.EdgeIsDelauney[i] = true;
+				ot.EdgeIsDelauney[oi] = true;
 
 				// Lets rotate shared edge one vertex CW to legalize it
 				RotateTrianglePair(t, p, ot, op);
@@ -816,8 +816,8 @@ namespace Poly2Tri {
 				// until we add a new triangle or point.
 				// XXX: need to think about this. Can these edges be tried after we 
 				//      return to previous recursive level?
-				t.dEdge[i] = false;
-				ot.dEdge[oi] = false;
+				t.EdgeIsDelauney[i] = false;
+				ot.EdgeIsDelauney[oi] = false;
 
 				// If triangle have been legalized no need to check the other edges since
 				// the recursive legalization will handles those so we can end here.
@@ -840,50 +840,50 @@ namespace Poly2Tri {
 		/// </summary>
 		private static void RotateTrianglePair( DelaunayTriangle t, TriangulationPoint p, DelaunayTriangle ot, TriangulationPoint op ) {
 			DelaunayTriangle n1, n2, n3, n4;
-			n1 = t.neighborCCW(p);
-			n2 = t.neighborCW(p);
-			n3 = ot.neighborCCW(op);
-			n4 = ot.neighborCW(op);
+			n1 = t.NeighborCCWFrom(p);
+			n2 = t.NeighborCWFrom(p);
+			n3 = ot.NeighborCCWFrom(op);
+			n4 = ot.NeighborCWFrom(op);
 
 			bool ce1, ce2, ce3, ce4;
-			ce1 = t.getConstrainedEdgeCCW(p);
-			ce2 = t.getConstrainedEdgeCW(p);
-			ce3 = ot.getConstrainedEdgeCCW(op);
-			ce4 = ot.getConstrainedEdgeCW(op);
+			ce1 = t.GetConstrainedEdgeCCW(p);
+			ce2 = t.GetConstrainedEdgeCW(p);
+			ce3 = ot.GetConstrainedEdgeCCW(op);
+			ce4 = ot.GetConstrainedEdgeCW(op);
 
 			bool de1, de2, de3, de4;
-			de1 = t.getDelunayEdgeCCW(p);
-			de2 = t.getDelunayEdgeCW(p);
-			de3 = ot.getDelunayEdgeCCW(op);
-			de4 = ot.getDelunayEdgeCW(op);
+			de1 = t.GetDelunayEdgeCCW(p);
+			de2 = t.GetDelunayEdgeCW(p);
+			de3 = ot.GetDelunayEdgeCCW(op);
+			de4 = ot.GetDelunayEdgeCW(op);
 
-			t.legalize(p, op);
-			ot.legalize(op, p);
+			t.Legalize(p, op);
+			ot.Legalize(op, p);
 
 			// Remap dEdge
-			ot.setDelunayEdgeCCW(p, de1);
-			t.setDelunayEdgeCW(p, de2);
-			t.setDelunayEdgeCCW(op, de3);
-			ot.setDelunayEdgeCW(op, de4);
+			ot.SetDelunayEdgeCCW(p, de1);
+			t.SetDelunayEdgeCW(p, de2);
+			t.SetDelunayEdgeCCW(op, de3);
+			ot.SetDelunayEdgeCW(op, de4);
 
 			// Remap cEdge
-			ot.setConstrainedEdgeCCW(p, ce1);
-			t.setConstrainedEdgeCW(p, ce2);
-			t.setConstrainedEdgeCCW(op, ce3);
-			ot.setConstrainedEdgeCW(op, ce4);
+			ot.SetConstrainedEdgeCCW(p, ce1);
+			t.SetConstrainedEdgeCW(p, ce2);
+			t.SetConstrainedEdgeCCW(op, ce3);
+			ot.SetConstrainedEdgeCW(op, ce4);
 
 			// Remap neighbors
 			// XXX: might optimize the markNeighbor by keeping track of
 			//      what side should be assigned to what neighbor after the 
 			//      rotation. Now mark neighbor does lots of testing to find 
 			//      the right side.
-			t.clearNeighbors();
-			ot.clearNeighbors();
-			if (n1 != null) ot.markNeighbor(n1);
-			if (n2 != null) t.markNeighbor(n2);
-			if (n3 != null) t.markNeighbor(n3);
-			if (n4 != null) ot.markNeighbor(n4);
-			t.markNeighbor(ot);
+			t.ClearNeighbors();
+			ot.ClearNeighbors();
+			if (n1 != null) ot.MarkNeighbor(n1);
+			if (n2 != null) t.MarkNeighbor(n2);
+			if (n3 != null) t.MarkNeighbor(n3);
+			if (n4 != null) ot.MarkNeighbor(n4);
+			t.MarkNeighbor(ot);
 		}
 	}
 }

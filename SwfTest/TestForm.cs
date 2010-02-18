@@ -32,9 +32,9 @@ namespace SwfTest {
 			fx.TranslateTransform(500, 500);
 			fx.ScaleTransform(1, -1);
 			foreach ( var tri in Monkey.Triangles ) fx.DrawPolygon(Pens.Green, new PointF[]
-				{ new PointF(5*tri.points[0].Xf,5*tri.points[0].Yf)
-				, new PointF(5*tri.points[1].Xf,5*tri.points[1].Yf)
-				, new PointF(5*tri.points[2].Xf,5*tri.points[2].Yf)
+				{ new PointF(5*tri.Points[0].Xf,5*tri.Points[0].Yf)
+				, new PointF(5*tri.Points[1].Xf,5*tri.Points[1].Yf)
+				, new PointF(5*tri.Points[2].Xf,5*tri.Points[2].Yf)
 				});
 			base.OnPaint(e);
 		}
