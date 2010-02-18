@@ -60,12 +60,19 @@ namespace Poly2Tri {
 				default: throw new IndexOutOfRangeException();
 				}
 			}}
+			public bool Contains( T value ) {
+				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) return true;
+				return false;
+			}
 			public int IndexOf( T value ) {
 				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) return i;
 				return -1;
 			}
 			public void Clear() {
 				_0=_1=_2=null;
+			}
+			public void Clear( T value ) {
+				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) this[i] = null;
 			}
 		}
 
@@ -111,14 +118,6 @@ namespace Poly2Tri {
 			return (p == Points[0] || p == Points[1] || p == Points[2]);
 		}
 
-		public bool Contains(DTSweepConstraint e) {
-			return (Contains(e.p) && Contains(e.q));
-		}
-
-		public bool Contains(TriangulationPoint p, TriangulationPoint q) {
-			return (Contains(p) && Contains(q));
-		}
-
 		/// <summary>
 		/// Update neighbor pointers
 		/// </summary>
@@ -144,32 +143,15 @@ namespace Poly2Tri {
 		/// Exhaustive search to update neighbor pointers
 		/// </summary>
 		public void MarkNeighbor( DelaunayTriangle t ) {
-			if (t.Contains(Points[1], Points[2])) {
-				Neighbors[0] = t;
-				t.MarkNeighbor(Points[1], Points[2], this);
-			} else if (t.Contains(Points[0], Points[2])) {
-				Neighbors[1] = t;
-				t.MarkNeighbor(Points[0], Points[2], this);
-			} else if (t.Contains(Points[0], Points[1])) {
-				Neighbors[2] = t;
-				t.MarkNeighbor(Points[0], Points[1], this);
-			} else {
-				//logger.error( "markNeighbor failed" );
-			}
-		}
+			// Points of this triangle also belonging to t
+			bool a = t.Contains(Points[0]);
+			bool b = t.Contains(Points[1]);
+			bool c = t.Contains(Points[2]);
 
-		public void ClearNeighbors() {
-			Neighbors[0] = Neighbors[1] = Neighbors[2] = null;
-		}
-
-		public void ClearNeighbor(DelaunayTriangle triangle) {
-			if (Neighbors[0] == triangle) {
-				Neighbors[0] = null;
-			} else if (Neighbors[1] == triangle) {
-				Neighbors[1] = null;
-			} else {
-				Neighbors[2] = null;
-			}
+			if      (b&&c) { Neighbors[0]=t; t.MarkNeighbor(Points[1],Points[2],this); }
+			else if (a&&c) { Neighbors[1]=t; t.MarkNeighbor(Points[0],Points[2],this); }
+			else if (a&&b) { Neighbors[2]=t; t.MarkNeighbor(Points[0],Points[1],this); }
+			else throw new Exception( "Failed to mark neighbor, doesn't share an edge!");
 		}
 
 		/// <param name="t">Opposite triangle</param>
@@ -179,41 +161,9 @@ namespace Poly2Tri {
 			return PointCWFrom(t.PointCWFrom(p));
 		}
 		
-		/// <summary>
-		/// The neighbor clockwise to given point
-		/// </summary>
-		public DelaunayTriangle NeighborCWFrom(TriangulationPoint point) {
-			if (point == Points[0]) {
-				return Neighbors[1];
-			} else if (point == Points[1]) {
-				return Neighbors[2];
-			}
-			return Neighbors[0];
-		}
-
-		/// <summary>
-		/// The neighbor counter-clockwise to given point
-		/// </summary>
-		public DelaunayTriangle NeighborCCWFrom(TriangulationPoint point) {
-			if (point == Points[0]) {
-				return Neighbors[2];
-			} else if (point == Points[1]) {
-				return Neighbors[0];
-			}
-			return Neighbors[1];
-		}
-
-		/// <summary>
-		/// The neighbor across to given point
-		/// </summary>
-		public DelaunayTriangle NeighborAcrossFrom(TriangulationPoint opoint) {
-			if (opoint == Points[0]) {
-				return Neighbors[0];
-			} else if (opoint == Points[1]) {
-				return Neighbors[1];
-			}
-			return Neighbors[2];
-		}
+		public DelaunayTriangle NeighborCWFrom    (TriangulationPoint point) { return Neighbors[(Points.IndexOf(point)+1)%3]; }
+		public DelaunayTriangle NeighborCCWFrom   (TriangulationPoint point) { return Neighbors[(Points.IndexOf(point)+2)%3]; }
+		public DelaunayTriangle NeighborAcrossFrom(TriangulationPoint point) { return Neighbors[ Points.IndexOf(point)     ]; }
 
 		/// <summary>
 		/// The point counter-clockwise to given point

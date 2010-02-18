@@ -877,8 +877,8 @@ namespace Poly2Tri {
 			//      what side should be assigned to what neighbor after the 
 			//      rotation. Now mark neighbor does lots of testing to find 
 			//      the right side.
-			t.ClearNeighbors();
-			ot.ClearNeighbors();
+			t.Neighbors.Clear();
+			ot.Neighbors.Clear();
 			if (n1 != null) ot.MarkNeighbor(n1);
 			if (n2 != null) t.MarkNeighbor(n2);
 			if (n3 != null) t.MarkNeighbor(n3);
