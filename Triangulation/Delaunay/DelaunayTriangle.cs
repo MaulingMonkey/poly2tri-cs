@@ -43,8 +43,36 @@ using System.Diagnostics;
 
 namespace Poly2Tri {
 	public class DelaunayTriangle {
-		public readonly TriangulationPoint[] Points = new TriangulationPoint[3];
-		public readonly DelaunayTriangle[] Neighbors = new DelaunayTriangle[3];
+		public struct FixedArray3<T> where T:class {
+			public T _0, _1, _2;
+			public T this[ int index ] { get {
+				switch ( index ) {
+				case 0: return _0;
+				case 1: return _1;
+				case 2: return _2;
+				default: throw new IndexOutOfRangeException();
+				}
+			} set {
+				switch ( index ) {
+				case 0: _0 = value; break;
+				case 1: _1 = value; break;
+				case 2: _2 = value; break;
+				default: throw new IndexOutOfRangeException();
+				}
+			}}
+			public int IndexOf( T value ) {
+				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) return i;
+				return -1;
+			}
+			public void Clear() {
+				_0=_1=_2=null;
+			}
+		}
+
+		public FixedArray3<TriangulationPoint> Points;
+		public FixedArray3<DelaunayTriangle  > Neighbors;
+		//public readonly TriangulationPoint[] Points = new TriangulationPoint[3];
+		//public readonly DelaunayTriangle[] Neighbors = new DelaunayTriangle[3];
 		public readonly bool[] EdgeIsConstrained = new bool[] { false, false, false };
 		public readonly bool[] EdgeIsDelauney    = new bool[] { false, false, false };
 		public bool IsInterior { get; set; }
@@ -56,14 +84,9 @@ namespace Poly2Tri {
 		}
 
 		public int IndexOf(TriangulationPoint p) {
-			if (p == Points[0]) {
-				return 0;
-			} else if (p == Points[1]) {
-				return 1;
-			} else if (p == Points[2]) {
-				return 2;
-			}
-			throw new RuntimeException("Calling index with a point that doesn't exist in triangle");
+			int i = Points.IndexOf(p);
+			if (i==-1) throw new RuntimeException("Calling index with a point that doesn't exist in triangle");
+			return i;
 		}
 
 		public int IndexCWFrom(TriangulationPoint p) {
@@ -103,16 +126,18 @@ namespace Poly2Tri {
 		/// <param name="p2">Point 2 of the shared edge</param>
 		/// <param name="t">This triangle's new neighbor</param>
 		private void MarkNeighbor( TriangulationPoint p1, TriangulationPoint p2, DelaunayTriangle t ) {
-			if ((p1 == Points[2] && p2 == Points[1]) || (p1 == Points[1] && p2 == Points[2])) {
-				Neighbors[0] = t;
-			} else if ((p1 == Points[0] && p2 == Points[2]) || (p1 == Points[2] && p2 == Points[0])) {
-				Neighbors[1] = t;
-			} else if ((p1 == Points[0] && p2 == Points[1]) || (p1 == Points[1] && p2 == Points[0])) {
-				Neighbors[2] = t;
-			} else {
-				//logger.error( "Neighbor error, please report!" );
-				// throw new Exception("Neighbor error, please report!");
-			}
+			int i1 = Points.IndexOf(p1);
+			int i2 = Points.IndexOf(p2);
+
+			// Points of this triangle in the edge p1-p2
+			bool a = (i1==0 || i2==0);
+			bool b = (i1==1 || i2==1);
+			bool c = (i1==2 || i2==2);
+
+			if      ( b&&c ) Neighbors[0] = t;
+			else if ( a&&c ) Neighbors[1] = t;
+			else if ( a&&b ) Neighbors[2] = t;
+			else throw new Exception("Neighbor error, please report!");
 		}
 
 		/// <summary>
