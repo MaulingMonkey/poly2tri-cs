@@ -237,8 +237,8 @@ namespace Poly2Tri {
 
 		private static void EdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			try {
-				tcx.EdgeEvent.constrainedEdge = edge;
-				tcx.EdgeEvent.right = edge.p.X > edge.q.X;
+				tcx.EdgeEvent.ConstrainedEdge = edge;
+				tcx.EdgeEvent.Right = edge.p.X > edge.q.X;
 
 				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().PrimaryTriangle = node.Triangle; }
 
@@ -256,7 +256,7 @@ namespace Poly2Tri {
 		}
 
 		private static void FillEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			if (tcx.EdgeEvent.right) {
+			if (tcx.EdgeEvent.Right) {
 				FillRightAboveEdgeEvent(tcx, edge, node);
 			} else {
 				FillLeftAboveEdgeEvent(tcx, edge, node);
@@ -489,8 +489,8 @@ namespace Poly2Tri {
 				tcx.MapTriangleToNodes(ot);
 
 				if (p == eq && op == ep) {
-					if (eq == tcx.EdgeEvent.constrainedEdge.q
-						&& ep == tcx.EdgeEvent.constrainedEdge.p) {
+					if (eq == tcx.EdgeEvent.ConstrainedEdge.q
+						&& ep == tcx.EdgeEvent.ConstrainedEdge.p) {
 						if (tcx.IsDebugEnabled) Console.WriteLine("[FLIP] - constrained edge done"); // TODO: remove
 						t.markConstrainedEdge(ep, eq);
 						ot.markConstrainedEdge(ep, eq);
