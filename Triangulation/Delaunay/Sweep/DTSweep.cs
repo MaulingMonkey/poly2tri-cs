@@ -547,14 +547,14 @@ namespace Poly2Tri {
 			if (o == Orientation.CCW) {
 				// ot is not crossing edge after flip
 				edgeIndex = ot.EdgeIndex(p, op);
-				ot.EdgeIsDelauney[edgeIndex] = true;
+				ot.EdgeIsDelaunay[edgeIndex] = true;
 				Legalize(tcx, ot);
 				ot.ClearDelunayEdges();
 				return t;
 			}
 			// t is not crossing edge after flip
 			edgeIndex = t.EdgeIndex(p, op);
-			t.EdgeIsDelauney[edgeIndex] = true;
+			t.EdgeIsDelaunay[edgeIndex] = true;
 			Legalize(tcx, t);
 			t.ClearDelunayEdges();
 			return ot;
@@ -781,7 +781,7 @@ namespace Poly2Tri {
 			for (int i = 0; i < 3; i++) {
 				// TODO: fix so that cEdge is always valid when creating new triangles then we can check it here
 				//       instead of below with ot
-				if (t.EdgeIsDelauney[i]) continue;
+				if (t.EdgeIsDelaunay[i]) continue;
 
 				DelaunayTriangle ot = t.Neighbors[i];
 				if (ot == null) continue;
@@ -791,7 +791,7 @@ namespace Poly2Tri {
 				int oi = ot.IndexOf(op);
 				// If this is a Constrained Edge or a Delaunay Edge(only during recursive legalization)
 				// then we should not try to legalize
-				if (ot.EdgeIsConstrained[oi] || ot.EdgeIsDelauney[oi]) {
+				if (ot.EdgeIsConstrained[oi] || ot.EdgeIsDelaunay[oi]) {
 					t.EdgeIsConstrained[i] = ot.EdgeIsConstrained[oi]; // XXX: have no good way of setting this property when creating new triangles so lets set it here
 					continue;
 				}
@@ -799,8 +799,8 @@ namespace Poly2Tri {
 				if (!TriangulationUtil.smartIncircle(p,t.PointCCWFrom(p),t.PointCWFrom(p),op)) continue;
 
 				// Lets mark this shared edge as Delaunay 
-				t.EdgeIsDelauney[i] = true;
-				ot.EdgeIsDelauney[oi] = true;
+				t.EdgeIsDelaunay[i] = true;
+				ot.EdgeIsDelaunay[oi] = true;
 
 				// Lets rotate shared edge one vertex CW to legalize it
 				RotateTrianglePair(t, p, ot, op);
@@ -816,8 +816,8 @@ namespace Poly2Tri {
 				// until we add a new triangle or point.
 				// XXX: need to think about this. Can these edges be tried after we 
 				//      return to previous recursive level?
-				t.EdgeIsDelauney[i] = false;
-				ot.EdgeIsDelauney[oi] = false;
+				t.EdgeIsDelaunay[i] = false;
+				ot.EdgeIsDelaunay[oi] = false;
 
 				// If triangle have been legalized no need to check the other edges since
 				// the recursive legalization will handles those so we can end here.
@@ -852,19 +852,19 @@ namespace Poly2Tri {
 			ce4 = ot.GetConstrainedEdgeCW(op);
 
 			bool de1, de2, de3, de4;
-			de1 = t.GetDelunayEdgeCCW(p);
-			de2 = t.GetDelunayEdgeCW(p);
-			de3 = ot.GetDelunayEdgeCCW(op);
-			de4 = ot.GetDelunayEdgeCW(op);
+			de1 = t.GetDelaunayEdgeCCW(p);
+			de2 = t.GetDelaunayEdgeCW(p);
+			de3 = ot.GetDelaunayEdgeCCW(op);
+			de4 = ot.GetDelaunayEdgeCW(op);
 
 			t.Legalize(p, op);
 			ot.Legalize(op, p);
 
 			// Remap dEdge
-			ot.SetDelunayEdgeCCW(p, de1);
-			t.SetDelunayEdgeCW(p, de2);
-			t.SetDelunayEdgeCCW(op, de3);
-			ot.SetDelunayEdgeCW(op, de4);
+			ot.SetDelaunayEdgeCCW(p, de1);
+			t.SetDelaunayEdgeCW(p, de2);
+			t.SetDelaunayEdgeCCW(op, de3);
+			ot.SetDelaunayEdgeCW(op, de4);
 
 			// Remap cEdge
 			ot.SetConstrainedEdgeCCW(p, ce1);

@@ -81,7 +81,7 @@ namespace Poly2Tri {
 		//public readonly TriangulationPoint[] Points = new TriangulationPoint[3];
 		//public readonly DelaunayTriangle[] Neighbors = new DelaunayTriangle[3];
 		public readonly bool[] EdgeIsConstrained = new bool[] { false, false, false };
-		public readonly bool[] EdgeIsDelauney    = new bool[] { false, false, false };
+		public readonly bool[] EdgeIsDelaunay    = new bool[] { false, false, false };
 		public bool IsInterior { get; set; }
 
 		public DelaunayTriangle(TriangulationPoint p1, TriangulationPoint p2, TriangulationPoint p3) {
@@ -256,124 +256,24 @@ namespace Poly2Tri {
 			return -1;
 		}
 
-		public bool GetConstrainedEdgeCCW(TriangulationPoint p) {
-			if (p == Points[0]) {
-				return EdgeIsConstrained[2];
-			} else if (p == Points[1]) {
-				return EdgeIsConstrained[0];
-			}
-			return EdgeIsConstrained[1];
-		}
+		public bool GetConstrainedEdgeCCW   ( TriangulationPoint p ) { return EdgeIsConstrained[(IndexOf(p)+2)%3]; }
+		public bool GetConstrainedEdgeCW    ( TriangulationPoint p ) { return EdgeIsConstrained[(IndexOf(p)+1)%3]; }
+		public bool GetConstrainedEdgeAcross( TriangulationPoint p ) { return EdgeIsConstrained[ IndexOf(p)     ]; }
+		public void SetConstrainedEdgeCCW   ( TriangulationPoint p, bool ce ) { EdgeIsConstrained[(IndexOf(p)+2)%3] = ce; }
+		public void SetConstrainedEdgeCW    ( TriangulationPoint p, bool ce ) { EdgeIsConstrained[(IndexOf(p)+1)%3] = ce; }
+		public void SetConstrainedEdgeAcross( TriangulationPoint p, bool ce ) { EdgeIsConstrained[ IndexOf(p)     ] = ce; }
 
-		public bool GetConstrainedEdgeCW(TriangulationPoint p) {
-			if (p == Points[0]) {
-				return EdgeIsConstrained[1];
-			} else if (p == Points[1]) {
-				return EdgeIsConstrained[2];
-			}
-			return EdgeIsConstrained[0];
-		}
-
-		public bool GetConstrainedEdgeAcross(TriangulationPoint p) {
-			if (p == Points[0]) {
-				return EdgeIsConstrained[0];
-			} else if (p == Points[1]) {
-				return EdgeIsConstrained[1];
-			}
-			return EdgeIsConstrained[2];
-		}
-
-		public void SetConstrainedEdgeCCW(TriangulationPoint p, bool ce) {
-			if (p == Points[0]) {
-				EdgeIsConstrained[2] = ce;
-			} else if (p == Points[1]) {
-				EdgeIsConstrained[0] = ce;
-			} else {
-				EdgeIsConstrained[1] = ce;
-			}
-		}
-
-		public void SetConstrainedEdgeCW(TriangulationPoint p, bool ce) {
-			if (p == Points[0]) {
-				EdgeIsConstrained[1] = ce;
-			} else if (p == Points[1]) {
-				EdgeIsConstrained[2] = ce;
-			} else {
-				EdgeIsConstrained[0] = ce;
-			}
-		}
-
-		public void SetConstrainedEdgeAcross(TriangulationPoint p, bool ce) {
-			if (p == Points[0]) {
-				EdgeIsConstrained[0] = ce;
-			} else if (p == Points[1]) {
-				EdgeIsConstrained[1] = ce;
-			} else {
-				EdgeIsConstrained[2] = ce;
-			}
-		}
-
-		public bool GetDelunayEdgeCCW(TriangulationPoint p) {
-			if (p == Points[0]) {
-				return EdgeIsDelauney[2];
-			} else if (p == Points[1]) {
-				return EdgeIsDelauney[0];
-			}
-			return EdgeIsDelauney[1];
-		}
-
-		public bool GetDelunayEdgeCW(TriangulationPoint p) {
-			if (p == Points[0]) {
-				return EdgeIsDelauney[1];
-			} else if (p == Points[1]) {
-				return EdgeIsDelauney[2];
-			}
-			return EdgeIsDelauney[0];
-		}
-
-		public bool GetDelunayEdgeAcross(TriangulationPoint p) {
-			if (p == Points[0]) {
-				return EdgeIsDelauney[0];
-			} else if (p == Points[1]) {
-				return EdgeIsDelauney[1];
-			}
-			return EdgeIsDelauney[2];
-		}
-
-		public void SetDelunayEdgeCCW(TriangulationPoint p, bool e) {
-			if (p == Points[0]) {
-				EdgeIsDelauney[2] = e;
-			} else if (p == Points[1]) {
-				EdgeIsDelauney[0] = e;
-			} else {
-				EdgeIsDelauney[1] = e;
-			}
-		}
-
-		public void SetDelunayEdgeCW(TriangulationPoint p, bool e) {
-			if (p == Points[0]) {
-				EdgeIsDelauney[1] = e;
-			} else if (p == Points[1]) {
-				EdgeIsDelauney[2] = e;
-			} else {
-				EdgeIsDelauney[0] = e;
-			}
-		}
-
-		public void SetDelunayEdgeAcross(TriangulationPoint p, bool e) {
-			if (p == Points[0]) {
-				EdgeIsDelauney[0] = e;
-			} else if (p == Points[1]) {
-				EdgeIsDelauney[1] = e;
-			} else {
-				EdgeIsDelauney[2] = e;
-			}
-		}
+		public bool GetDelaunayEdgeCCW   ( TriangulationPoint p ) { return EdgeIsDelaunay[(IndexOf(p)+2)%3]; }
+		public bool GetDelaunayEdgeCW    ( TriangulationPoint p ) { return EdgeIsDelaunay[(IndexOf(p)+1)%3]; }
+		public bool GetDelaunayEdgeAcross( TriangulationPoint p ) { return EdgeIsDelaunay[ IndexOf(p)     ]; }
+		public void SetDelaunayEdgeCCW   ( TriangulationPoint p, bool ce ) { EdgeIsDelaunay[(IndexOf(p)+2)%3] = ce; }
+		public void SetDelaunayEdgeCW    ( TriangulationPoint p, bool ce ) { EdgeIsDelaunay[(IndexOf(p)+1)%3] = ce; }
+		public void SetDelaunayEdgeAcross( TriangulationPoint p, bool ce ) { EdgeIsDelaunay[ IndexOf(p)     ] = ce; }
 
 		public void ClearDelunayEdges() {
-			EdgeIsDelauney[0] = false;
-			EdgeIsDelauney[1] = false;
-			EdgeIsDelauney[2] = false;
+			EdgeIsDelaunay[0] = false;
+			EdgeIsDelaunay[1] = false;
+			EdgeIsDelaunay[2] = false;
 		}
 	}
 }
