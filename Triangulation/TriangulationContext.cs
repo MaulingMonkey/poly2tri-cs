@@ -105,7 +105,7 @@ namespace Poly2Tri {
 
 		public DTSweepDebugContext getDebugContextAsDT() { return getDebugContext() as DTSweepDebugContext; }
 
-		public void addPoints(List<TriangulationPoint> points) {
+		public void addPoints(IList<TriangulationPoint> points) {
 			_points.addAll(points);
 		}
 	}

@@ -33,38 +33,34 @@ using System.Collections.Generic;
 
 namespace Poly2Tri {
 	public class PointSet : Triangulatable {
-		protected ArrayList<TriangulationPoint> _points;
-		protected ArrayList<DelaunayTriangle> _triangles;
+		public IList<TriangulationPoint> Points { get; private set; }
+		public IList<DelaunayTriangle> Triangles { get; private set; }
 
 		public PointSet(ArrayList<TriangulationPoint> points) {
-			_points = new ArrayList<TriangulationPoint>();
-			_points.addAll(points);
+			Points = new List<TriangulationPoint>(points);
 		}
 
 		public virtual TriangulationMode TriangulationMode { get { return TriangulationMode.UNCONSTRAINED; }}
 
-		public IList<TriangulationPoint> Points { get { return _points; } }
-		public IList<DelaunayTriangle> Triangles { get { return _triangles; }}
-
 		public void AddTriangle(DelaunayTriangle t) {
-			_triangles.add(t);
+			Triangles.Add(t);
 		}
 
 		public void AddTriangles(ArrayList<DelaunayTriangle> list) {
-			_triangles.addAll(list);
+			foreach ( var tri in list ) Triangles.Add(tri);
 		}
 
 		public void ClearTriangles() {
-			_triangles.clear();
+			Triangles.Clear();
 		}
 
 		public virtual void Prepare(TriangulationContext tcx) {
-			if (_triangles == null) {
-				_triangles = new ArrayList<DelaunayTriangle>(_points.size());
+			if (Triangles == null) {
+				Triangles = new List<DelaunayTriangle>(Points.Count);
 			} else {
-				_triangles.clear();
+				Triangles.Clear();
 			}
-			tcx.addPoints(_points);
+			tcx.addPoints(Points);
 		}
 	}
 }
