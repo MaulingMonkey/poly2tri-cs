@@ -79,6 +79,8 @@
     <Compile Include="Triangulation\Util\RedBlackBST.cs" />
     <Compile Include="Triangulation\Util\Tuple2.cs" />
     <Compile Include="Triangulation\Util\Tuple3.cs" />
+    <Compile Include="Utility\FixedArray3.cs" />
+    <Compile Include="Utility\FixedBitArray3.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

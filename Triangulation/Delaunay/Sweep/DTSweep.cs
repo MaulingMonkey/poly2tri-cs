@@ -549,14 +549,14 @@ namespace Poly2Tri {
 				edgeIndex = ot.EdgeIndex(p, op);
 				ot.EdgeIsDelaunay[edgeIndex] = true;
 				Legalize(tcx, ot);
-				ot.ClearDelunayEdges();
+				ot.EdgeIsDelaunay.Clear();
 				return t;
 			}
 			// t is not crossing edge after flip
 			edgeIndex = t.EdgeIndex(p, op);
 			t.EdgeIsDelaunay[edgeIndex] = true;
 			Legalize(tcx, t);
-			t.ClearDelunayEdges();
+			t.EdgeIsDelaunay.Clear();
 			return ot;
 		}
 

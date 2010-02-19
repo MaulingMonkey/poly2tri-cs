@@ -40,56 +40,12 @@
 
 using System;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Collections;
 
 namespace Poly2Tri {
 	public class DelaunayTriangle {
-		public struct FixedArray3<T> : IEnumerable<T> where T:class {
-			public T _0, _1, _2;
-			public T this[ int index ] { get {
-				switch ( index ) {
-				case 0: return _0;
-				case 1: return _1;
-				case 2: return _2;
-				default: throw new IndexOutOfRangeException();
-				}
-			} set {
-				switch ( index ) {
-				case 0: _0 = value; break;
-				case 1: _1 = value; break;
-				case 2: _2 = value; break;
-				default: throw new IndexOutOfRangeException();
-				}
-			}}
-			public bool Contains( T value ) {
-				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) return true;
-				return false;
-			}
-			public int IndexOf( T value ) {
-				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) return i;
-				return -1;
-			}
-			public void Clear() {
-				_0=_1=_2=null;
-			}
-			public void Clear( T value ) {
-				for ( int i = 0 ; i < 3 ; ++i ) if ( this[i]==value ) this[i] = null;
-			}
-
-			private IEnumerable<T> Enumerate() {
-				for ( int i=0 ; i<3 ; ++i ) yield return this[i];
-			}
-			public IEnumerator<T> GetEnumerator() { return Enumerate().GetEnumerator(); }
-			IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
-		}
-
 		public FixedArray3<TriangulationPoint> Points;
 		public FixedArray3<DelaunayTriangle  > Neighbors;
-		//public readonly TriangulationPoint[] Points = new TriangulationPoint[3];
-		//public readonly DelaunayTriangle[] Neighbors = new DelaunayTriangle[3];
-		public readonly bool[] EdgeIsConstrained = new bool[] { false, false, false };
-		public readonly bool[] EdgeIsDelaunay    = new bool[] { false, false, false };
+		public FixedBitArray3 EdgeIsConstrained, EdgeIsDelaunay;
 		public bool IsInterior { get; set; }
 
 		public DelaunayTriangle(TriangulationPoint p1, TriangulationPoint p2, TriangulationPoint p3) {
@@ -104,27 +60,10 @@ namespace Poly2Tri {
 			return i;
 		}
 
-		public int IndexCWFrom(TriangulationPoint p) {
-			int i = IndexOf(p);
-			switch (i) {
-			case 0: return 2;
-			case 1: return 0;
-			default: return 1;
-			}
-		}
+		public int IndexCWFrom (TriangulationPoint p) { return (IndexOf(p)+2)%3; }
+		public int IndexCCWFrom(TriangulationPoint p) { return (IndexOf(p)+1)%3; }
 
-		public int IndexCCWFrom(TriangulationPoint p) {
-			int i = IndexOf(p);
-			switch (i) {
-			case 0: return 1;
-			case 1: return 2;
-			default: return 0;
-			}
-		}
-
-		public bool Contains(TriangulationPoint p) {
-			return (p == Points[0] || p == Points[1] || p == Points[2]);
-		}
+		public bool Contains(TriangulationPoint p) { return Points.Contains(p); }
 
 		/// <summary>
 		/// Update neighbor pointers
@@ -167,27 +106,21 @@ namespace Poly2Tri {
 		public TriangulationPoint PointCCWFrom(TriangulationPoint point) { return Points[(IndexOf(point)+1)%3]; }
 		public TriangulationPoint PointCWFrom (TriangulationPoint point) { return Points[(IndexOf(point)+2)%3]; }
 
+		private void RotateCW() {
+			var t = Points[2];
+			Points[2] = Points[1];
+			Points[1] = Points[0];
+			Points[0] = t;
+		}
+
 		/// <summary>
 		/// Legalize triangle by rotating clockwise around oPoint
 		/// </summary>
 		/// <param name="oPoint">The origin point to rotate around</param>
 		/// <param name="nPoint">???</param>
 		public void Legalize(TriangulationPoint oPoint, TriangulationPoint nPoint) {
-			if (oPoint == Points[0]) {
-				Points[1] = Points[0];
-				Points[0] = Points[2];
-				Points[2] = nPoint;
-			} else if (oPoint == Points[1]) {
-				Points[2] = Points[1];
-				Points[1] = Points[0];
-				Points[0] = nPoint;
-			} else if (oPoint == Points[2]) {
-				Points[0] = Points[2];
-				Points[2] = Points[1];
-				Points[1] = nPoint;
-			} else {
-				throw new RuntimeException("legalization bug");
-			}
+			RotateCW();
+			Points[IndexCCWFrom(oPoint)] = nPoint;
 		}
 
 		public override string ToString() { return Points[0] + "," + Points[1] + "," + Points[2]; }
@@ -277,11 +210,5 @@ namespace Poly2Tri {
 		public void SetDelaunayEdgeCCW   ( TriangulationPoint p, bool ce ) { EdgeIsDelaunay[(IndexOf(p)+2)%3] = ce; }
 		public void SetDelaunayEdgeCW    ( TriangulationPoint p, bool ce ) { EdgeIsDelaunay[(IndexOf(p)+1)%3] = ce; }
 		public void SetDelaunayEdgeAcross( TriangulationPoint p, bool ce ) { EdgeIsDelaunay[ IndexOf(p)     ] = ce; }
-
-		public void ClearDelunayEdges() {
-			EdgeIsDelaunay[0] = false;
-			EdgeIsDelaunay[1] = false;
-			EdgeIsDelaunay[2] = false;
-		}
 	}
 }
