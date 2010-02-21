@@ -73,7 +73,7 @@ namespace Poly2Tri {
 		}
 
 		public static void Triangulate(TriangulationContext tcx) {
-			switch (tcx.Algorithm()) {
+			switch (tcx.Algorithm) {
 			case TriangulationAlgorithm.DTSweep:
 			default:
 				DTSweep.Triangulate((DTSweepContext)tcx);

@@ -171,7 +171,7 @@ namespace Poly2Tri {
 			_triangles.add(t);
 		}
 
-		public void AddTriangles( ArrayList<DelaunayTriangle> list ) {
+		public void AddTriangles( IEnumerable<DelaunayTriangle> list ) {
 			_triangles.addAll(list);
 		}
 
@@ -195,7 +195,7 @@ namespace Poly2Tri {
 			// Outer constraints
 			for (int i = 0; i < _points.size() - 1; i++) tcx.NewConstraint(_points.get(i), _points.get(i + 1));
 			tcx.NewConstraint(_points.get(0), _points.get(_points.size() - 1));
-			tcx.addPoints(_points);
+			tcx.Points.AddRange(_points);
 
 			// Hole constraints
 			if (_holes != null) {
@@ -204,12 +204,12 @@ namespace Poly2Tri {
 						tcx.NewConstraint(p._points.get(i), p._points.get(i + 1));
 					}
 					tcx.NewConstraint(p._points.get(0), p._points.get(p._points.size() - 1));
-					tcx.addPoints(p._points);
+					tcx.Points.AddRange(p._points);
 				}
 			}
 
 			if (_steinerPoints != null) {
-				tcx.addPoints(_steinerPoints);
+				tcx.Points.AddRange(_steinerPoints);
 			}
 		}
 

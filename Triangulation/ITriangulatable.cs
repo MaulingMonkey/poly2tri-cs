@@ -39,7 +39,7 @@ namespace Poly2Tri {
 		IList<DelaunayTriangle> Triangles { get; }
 
 		void AddTriangle(DelaunayTriangle t);
-		void AddTriangles(ArrayList<DelaunayTriangle> list);
+		void AddTriangles(IEnumerable<DelaunayTriangle> list);
 		void ClearTriangles();
 
 		TriangulationMode TriangulationMode { get; }

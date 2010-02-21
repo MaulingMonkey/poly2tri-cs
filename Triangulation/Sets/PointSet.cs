@@ -46,7 +46,7 @@ namespace Poly2Tri {
 			Triangles.Add(t);
 		}
 
-		public void AddTriangles(ArrayList<DelaunayTriangle> list) {
+		public void AddTriangles(IEnumerable<DelaunayTriangle> list) {
 			foreach ( var tri in list ) Triangles.Add(tri);
 		}
 
@@ -60,7 +60,7 @@ namespace Poly2Tri {
 			} else {
 				Triangles.Clear();
 			}
-			tcx.addPoints(Points);
+			tcx.Points.AddRange(Points);
 		}
 	}
 }

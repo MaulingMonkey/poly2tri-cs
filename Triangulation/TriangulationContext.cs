@@ -29,84 +29,43 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using boolean = System.Boolean;
 using System.Collections.Generic;
 
 namespace Poly2Tri {
 	public abstract class TriangulationContext {
-		protected TriangulationDebugContext _debug;
+		public TriangulationDebugContext DebugContext { get; protected set; }
 
-		protected ArrayList<DelaunayTriangle> _triList = new ArrayList<DelaunayTriangle>();
+		public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
+		public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
+		public TriangulationMode TriangulationMode { get; protected set; }
+		public Triangulatable Triangulatable { get; private set; }
 
-		public readonly ArrayList<TriangulationPoint> _points = new ArrayList<TriangulationPoint>(200);
-		protected TriangulationMode _triangulationMode;
-		protected Triangulatable _triUnit;
+		public int StepCount { get; private set; }
 
-		private boolean _waitUntilNotified;
-
-		private int _stepCount = 0;
-		public int getStepCount() { return _stepCount; }
-
-		public void done() {
-			_stepCount++;
+		public void Done() {
+			StepCount++;
 		}
 
-		public abstract TriangulationAlgorithm Algorithm();
+		public abstract TriangulationAlgorithm Algorithm { get; }
 
 		public virtual void PrepareTriangulation(Triangulatable t) {
-			_triUnit = t;
-			_triangulationMode = t.TriangulationMode;
+			Triangulatable = t;
+			TriangulationMode = t.TriangulationMode;
 			t.Prepare(this);
 		}
 
 		public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
 
-		public void addToList(DelaunayTriangle triangle) {
-			_triList.add(triangle);
-		}
-
-		public List<DelaunayTriangle> getTriangles() {
-			return _triList;
-		}
-
-		public Triangulatable getTriangulatable() {
-			return _triUnit;
-		}
-
-		public ArrayList<TriangulationPoint> getPoints() {
-			return _points;
-		}
-
-		public void update(string message) {
-		}
+		public void Update(string message) {}
 
 		public virtual void Clear() {
-			_points.clear();
-			if (_debug != null) {
-				_debug.Clear();
-			}
-			_stepCount = 0;
-		}
-
-		public TriangulationMode TriangulationMode { get { return _triangulationMode; }}
-
-		public void waitUntilNotified(boolean b) {
-			_waitUntilNotified = b;
-		}
-
-		public void terminateTriangulation() {
+			Points.Clear();
+			if (DebugContext != null) DebugContext.Clear();
+			StepCount = 0;
 		}
 
 		public virtual bool IsDebugEnabled { get; protected set; }
 
-		public TriangulationDebugContext getDebugContext() {
-			return _debug;
-		}
-
-		public DTSweepDebugContext getDebugContextAsDT() { return getDebugContext() as DTSweepDebugContext; }
-
-		public void addPoints(IList<TriangulationPoint> points) {
-			_points.addAll(points);
-		}
+		public DTSweepDebugContext DTDebugContext { get { return DebugContext as DTSweepDebugContext; } }
 	}
 }

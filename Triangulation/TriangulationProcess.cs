@@ -77,12 +77,12 @@ namespace Poly2Tri {
 		 */
 		private void sendEvent(TriangulationProcessEvent e) {
 			foreach (TriangulationProcessListener l in _listeners) {
-				l.triangulationEvent(e, _tcx.getTriangulatable());
+				l.triangulationEvent(e, _tcx.Triangulatable);
 			}
 		}
 
 		public int getStepCount() {
-			return _tcx.getStepCount();
+			return _tcx.StepCount;
 		}
 
 		public DateTime getTimestamp() {
@@ -191,7 +191,7 @@ namespace Poly2Tri {
 				foreach (Triangulatable t in _triangulations) {
 					_tcx.Clear();
 					_tcx.PrepareTriangulation(t);
-					_pointCount += _tcx._points.size();
+					_pointCount += _tcx.Points.Count;
 					Poly2Tri.Triangulate(_tcx);
 				}
 				//_triangulationTime = ( System.nanoTime() - time ) / 1e6;
@@ -230,7 +230,6 @@ namespace Poly2Tri {
 
 		public void shutdown() {
 			_awaitingTermination = true;
-			_tcx.terminateTriangulation();
 			resume();
 		}
 
@@ -240,10 +239,6 @@ namespace Poly2Tri {
 
 		public boolean isDone() {
 			return _isTerminated;
-		}
-
-		public void requestRead() {
-			_tcx.waitUntilNotified(true);
 		}
 
 		public boolean isReadable() {

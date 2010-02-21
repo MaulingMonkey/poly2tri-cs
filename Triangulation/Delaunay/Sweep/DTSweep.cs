@@ -83,18 +83,16 @@ namespace Poly2Tri {
 				FinalizationConvexHull(tcx);
 			}
 
-			tcx.done();
+			tcx.Done();
 		}
 
 		/// <summary>
 		/// Start sweeping the Y-sorted point set from bottom to top
 		/// </summary>
 		private static void Sweep( DTSweepContext tcx ) {
-			List<TriangulationPoint> points;
+			var points = tcx.Points;
 			TriangulationPoint point;
 			AdvancingFrontNode node;
-
-			points = tcx.getPoints();
 
 			for (int i = 1; i < points.Count; i++) {
 				point = points[i];
@@ -102,10 +100,10 @@ namespace Poly2Tri {
 				node = PointEvent(tcx, point);
 
 				if (point.hasEdges()) foreach (DTSweepConstraint e in point.getEdges()) {
-					if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveConstraint = e;
+					if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveConstraint = e;
 					EdgeEvent(tcx, e, node);
 				}
-				tcx.update(null);
+				tcx.Update(null);
 			}
 		}
 
@@ -156,7 +154,7 @@ namespace Poly2Tri {
 		private static void TurnAdvancingFrontConvex( DTSweepContext tcx, AdvancingFrontNode b, AdvancingFrontNode c ) {
 			AdvancingFrontNode first = b;
 			while (c != tcx.Front.Tail) {
-				if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = c;
+				if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = c;
 
 				if (TriangulationUtil.orient2d(b.Point, c.Point, c.Next.Point) == Orientation.CCW) {
 					// [b,c,d] Concave - fill around c
@@ -196,7 +194,7 @@ namespace Poly2Tri {
 			AdvancingFrontNode node, newNode;
 
 			node = tcx.LocateNode(point);
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
+			if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
 			newNode = NewFrontTriangle(tcx, point, node);
 
 			// Only need to check +epsilon since point never have smaller 
@@ -218,7 +216,7 @@ namespace Poly2Tri {
 
 			triangle = new DelaunayTriangle(point, node.Point, node.Next.Point);
 			triangle.MarkNeighbor(node.Triangle);
-			tcx.addToList(triangle);
+			tcx.Triangles.Add(triangle);
 
 			newNode = new AdvancingFrontNode(point);
 			newNode.Next = node.Next;
@@ -228,7 +226,7 @@ namespace Poly2Tri {
 
 			tcx.AddNode(newNode); // XXX: BST
 
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = newNode;
+			if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = newNode;
 
 			if (!Legalize(tcx, triangle)) tcx.MapTriangleToNodes(triangle);
 
@@ -240,7 +238,7 @@ namespace Poly2Tri {
 				tcx.EdgeEvent.ConstrainedEdge = edge;
 				tcx.EdgeEvent.Right = edge.P.X > edge.Q.X;
 
-				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().PrimaryTriangle = node.Triangle; }
+				if (tcx.IsDebugEnabled) { tcx.DTDebugContext.PrimaryTriangle = node.Triangle; }
 
 				if (IsEdgeSideOfTriangle(node.Triangle, edge.P, edge.Q)) return;
 
@@ -297,7 +295,7 @@ namespace Poly2Tri {
 		}
 
 		private static void FillRightBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
+			if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
 
 			if (node.Point.X < edge.P.X) { // needed?
 				if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
@@ -315,7 +313,7 @@ namespace Poly2Tri {
 
 		private static void FillRightAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			while (node.Next.Point.X < edge.P.X) {
-				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().ActiveNode = node; }
+				if (tcx.IsDebugEnabled) { tcx.DTDebugContext.ActiveNode = node; }
 				// Check if next node is below the edge
 				Orientation o1 = TriangulationUtil.orient2d(edge.Q, node.Next.Point, edge.P);
 				if (o1 == Orientation.CCW) {
@@ -360,7 +358,7 @@ namespace Poly2Tri {
 		}
 
 		private static void FillLeftBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
+			if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
 
 			if (node.Point.X > edge.P.X) {
 				if (TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
@@ -378,7 +376,7 @@ namespace Poly2Tri {
 
 		private static void FillLeftAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			while (node.Prev.Point.X > edge.P.X) {
-				if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
+				if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
 				// Check if next node is below the edge
 				Orientation o1 = TriangulationUtil.orient2d(edge.Q, node.Prev.Point, edge.P);
 				if (o1 == Orientation.CW) {
@@ -401,7 +399,7 @@ namespace Poly2Tri {
 		private static void EdgeEvent( DTSweepContext tcx, TriangulationPoint ep, TriangulationPoint eq, DelaunayTriangle triangle, TriangulationPoint point ) {
 			TriangulationPoint p1, p2;
 
-			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().PrimaryTriangle=triangle;
+			if (tcx.IsDebugEnabled) tcx.DTDebugContext.PrimaryTriangle=triangle;
 
 			if (IsEdgeSideOfTriangle(triangle, ep, eq)) return;
 
@@ -477,8 +475,8 @@ namespace Poly2Tri {
 			}
 
 			if (tcx.IsDebugEnabled) {
-				tcx.getDebugContextAsDT().PrimaryTriangle   = t;
-				tcx.getDebugContextAsDT().SecondaryTriangle = ot;
+				tcx.DTDebugContext.PrimaryTriangle   = t;
+				tcx.DTDebugContext.SecondaryTriangle = ot;
 			} // TODO: remove
 
 			bool inScanArea = TriangulationUtil.inScanArea(p, t.PointCCWFrom(p), t.PointCWFrom(p), op);
@@ -588,8 +586,8 @@ namespace Poly2Tri {
 
 			if (tcx.IsDebugEnabled) {
 				Console.WriteLine("[FLIP:SCAN] - scan next point"); // TODO: remove
-				tcx.getDebugContextAsDT().PrimaryTriangle = t;
-				tcx.getDebugContextAsDT().SecondaryTriangle = ot;
+				tcx.DTDebugContext.PrimaryTriangle = t;
+				tcx.DTDebugContext.SecondaryTriangle = ot;
 			}
 
 			inScanArea = TriangulationUtil.inScanArea(eq, flipTriangle.PointCCWFrom(eq), flipTriangle.PointCWFrom(eq), op);
@@ -761,7 +759,7 @@ namespace Poly2Tri {
 			//       for now cEdge values are copied during the legalize 
 			triangle.MarkNeighbor(node.Prev.Triangle);
 			triangle.MarkNeighbor(node.Triangle);
-			tcx.addToList(triangle);
+			tcx.Triangles.Add(triangle);
 
 			// Update the advancing front
 			node.Prev.Next = node.Next;

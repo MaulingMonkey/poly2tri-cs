@@ -56,12 +56,12 @@ namespace Poly2Tri {
 		public override bool IsDebugEnabled { get {
 			return base.IsDebugEnabled;
 		} protected set {
-			if (value && _debug == null) _debug = new DTSweepDebugContext(this);
+			if (value && DebugContext == null) DebugContext = new DTSweepDebugContext(this);
 			base.IsDebugEnabled = value;
 		}}
 
 		public void RemoveFromList( DelaunayTriangle triangle ) {
-			_triList.remove(triangle);
+			Triangles.Remove(triangle);
 			// TODO: remove all neighbor pointers to this triangle
 			//        for( int i=0; i<3; i++ )
 			//        {
@@ -80,7 +80,7 @@ namespace Poly2Tri {
 		private void MeshCleanReq( DelaunayTriangle triangle ) {
 			if (triangle != null && !triangle.IsInterior) {
 				triangle.IsInterior = true;
-				_triUnit.AddTriangle(triangle);
+				Triangulatable.AddTriangle(triangle);
 
 				for (int i = 0; i < 3; i++)
 				if (!triangle.EdgeIsConstrained[i])
@@ -92,7 +92,7 @@ namespace Poly2Tri {
 
 		public override void Clear() {
 			base.Clear();
-			_triList.clear();
+			Triangles.Clear();
 		}
 
 		public void AddNode( AdvancingFrontNode node ) {
@@ -114,8 +114,8 @@ namespace Poly2Tri {
 		public void CreateAdvancingFront() {
 			AdvancingFrontNode head, tail, middle;
 			// Initial triangle
-			DelaunayTriangle iTriangle = new DelaunayTriangle(_points.get(0), Tail, Head);
-			addToList(iTriangle);
+			DelaunayTriangle iTriangle = new DelaunayTriangle(Points[0], Tail, Head);
+			Triangles.Add(iTriangle);
 
 			head = new AdvancingFrontNode(iTriangle.Points[1]);
 			head.Triangle = iTriangle;
@@ -157,11 +157,11 @@ namespace Poly2Tri {
 			double xmax, xmin;
 			double ymax, ymin;
 
-			xmax = xmin = _points.get(0).X;
-			ymax = ymin = _points.get(0).Y;
+			xmax = xmin = Points[0].X;
+			ymax = ymin = Points[0].Y;
 
 			// Calculate bounds. Should be combined with the sorting
-			foreach (TriangulationPoint p in _points) {
+			foreach (TriangulationPoint p in Points) {
 				if (p.X > xmax) xmax = p.X;
 				if (p.X < xmin) xmin = p.X;
 				if (p.Y > ymax) ymax = p.Y;
@@ -178,22 +178,20 @@ namespace Poly2Tri {
 
 			//        long time = System.nanoTime();
 			// Sort the points along y-axis
-			_points.Sort(_comparator);
+			Points.Sort(_comparator);
 			//        logger.info( "Triangulation setup [{}ms]", ( System.nanoTime() - time ) / 1e6 );
 		}
 
 
 		public void FinalizeTriangulation() {
-			_triUnit.AddTriangles(_triList);
-			_triList.clear();
+			Triangulatable.AddTriangles(Triangles);
+			Triangles.Clear();
 		}
 
 		public override TriangulationConstraint NewConstraint( TriangulationPoint a, TriangulationPoint b ) {
 			return new DTSweepConstraint(a, b);
 		}
 
-		public override TriangulationAlgorithm Algorithm() {
-			return TriangulationAlgorithm.DTSweep;
-		}
+		public override TriangulationAlgorithm Algorithm { get { return TriangulationAlgorithm.DTSweep; }}
 	}
 }
