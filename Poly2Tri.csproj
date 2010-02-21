@@ -68,9 +68,6 @@
     <Compile Include="Triangulation\TriangulationDebugContext.cs" />
     <Compile Include="Triangulation\TriangulationMode.cs" />
     <Compile Include="Triangulation\TriangulationPoint.cs" />
-    <Compile Include="Triangulation\TriangulationProcess.cs" />
-    <Compile Include="Triangulation\TriangulationProcessEvent.cs" />
-    <Compile Include="Triangulation\TriangulationProcessListener.cs" />
     <Compile Include="Triangulation\TriangulationUtil.cs" />
     <Compile Include="Triangulation\Util\PointGenerator.cs" />
     <Compile Include="Triangulation\Util\PolygonGenerator.cs" />
