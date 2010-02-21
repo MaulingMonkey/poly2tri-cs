@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Poly2Tri.cs" />
+    <Compile Include="P2T.cs" />
     <Compile Include="Polygon\Polygon.cs" />
     <Compile Include="Polygon\PolygonPoint.cs" />
     <Compile Include="Polygon\PolygonSet.cs" />

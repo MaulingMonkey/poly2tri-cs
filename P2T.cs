@@ -30,7 +30,7 @@
  */
 
 namespace Poly2Tri {
-	public static class Poly2Tri {
+	public static class P2T {
 		private static TriangulationAlgorithm _defaultAlgorithm = TriangulationAlgorithm.DTSweep;
 
 		public static void Triangulate(PolygonSet ps) {

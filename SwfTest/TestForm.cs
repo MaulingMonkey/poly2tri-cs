@@ -24,7 +24,7 @@ namespace SwfTest {
 			}
 
 			Monkey = new Polygon(monkeydata.Select(p => new PolygonPoint(p.X, p.Y)));
-			Poly2Tri.Poly2Tri.Triangulate(Monkey);
+			P2T.Triangulate(Monkey);
 		}
 
 		protected override void OnPaint( PaintEventArgs e ) {
