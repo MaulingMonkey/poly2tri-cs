@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SwfTest")]
+[assembly: AssemblyTitle("Debug")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Poly2Tri Contributors")]
-[assembly: AssemblyProduct("SwfTest")]
+[assembly: AssemblyProduct("Debug")]
 [assembly: AssemblyCopyright("Copyright © Poly2Tri Contributors 2009-2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("1f8738ba-9378-4efb-8872-8e134b6e3e5a")]
+[assembly: Guid("87dc59e4-c17c-4c6c-8213-29363a9b3c15")]
 
 // Version information for an assembly consists of the following four values:
 //

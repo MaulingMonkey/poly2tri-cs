@@ -8,7 +8,7 @@
     <ProjectGuid>{FC6F045E-7112-44BF-A491-99D987D9C6D2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ExampleData</RootNamespace>
+    <RootNamespace>Poly2Tri</RootNamespace>
     <AssemblyName>ExampleData</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

@@ -166,6 +166,7 @@ namespace Poly2Tri {
 
 		public IList<TriangulationPoint> Points { get { return _points; } }
 		public IList<DelaunayTriangle> Triangles { get { return _triangles; } }
+		public IList<Polygon> Holes { get { return _holes; }}
 
 		public void AddTriangle( DelaunayTriangle t ) {
 			_triangles.Add(t);

@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Poly2Tri")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Poly2Tri Contributors")]
 [assembly: AssemblyProduct("Poly2Tri")]
 [assembly: AssemblyCopyright("Copyright © Poly2Tri Contributors 2009-2010")]
 [assembly: AssemblyTrademark("")]
