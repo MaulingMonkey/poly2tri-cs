@@ -157,13 +157,13 @@ namespace Poly2Tri {
 			while (c != tcx.Front.Tail) {
 				if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = c;
 
-				if (TriangulationUtil.orient2d(b.Point, c.Point, c.Next.Point) == Orientation.CCW) {
+				if (TriangulationUtil.Orient2d(b.Point, c.Point, c.Next.Point) == Orientation.CCW) {
 					// [b,c,d] Concave - fill around c
 					Fill(tcx, c);
 					c = c.Next;
 				} else {
 					// [b,c,d] Convex
-					if (b != first && TriangulationUtil.orient2d(b.Prev.Point, b.Point, c.Point) == Orientation.CCW) {
+					if (b != first && TriangulationUtil.Orient2d(b.Prev.Point, b.Point, c.Point) == Orientation.CCW) {
 						// [a,b,c] Concave - fill around b
 						Fill(tcx, b);
 						b = b.Prev;
@@ -266,9 +266,9 @@ namespace Poly2Tri {
 			Fill(tcx, node.Next);
 			if (node.Next.Point != edge.P) {
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.Q, node.Next.Point, edge.P) == Orientation.CCW) {
+				if (TriangulationUtil.Orient2d(edge.Q, node.Next.Point, edge.P) == Orientation.CCW) {
 					// Below
-					if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
+					if (TriangulationUtil.Orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 						// Next is concave
 						FillRightConcaveEdgeEvent(tcx, edge, node);
 					} else {
@@ -280,13 +280,13 @@ namespace Poly2Tri {
 
 		private static void FillRightConvexEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			// Next concave or convex?
-			if (TriangulationUtil.orient2d(node.Next.Point, node.Next.Next.Point, node.Next.Next.Next.Point) == Orientation.CCW) {
+			if (TriangulationUtil.Orient2d(node.Next.Point, node.Next.Next.Point, node.Next.Next.Next.Point) == Orientation.CCW) {
 				// Concave
 				FillRightConcaveEdgeEvent(tcx, edge, node.Next);
 			} else {
 				// Convex
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.Q, node.Next.Next.Point, edge.P) == Orientation.CCW) {
+				if (TriangulationUtil.Orient2d(edge.Q, node.Next.Next.Point, edge.P) == Orientation.CCW) {
 					// Below
 					FillRightConvexEdgeEvent(tcx, edge, node.Next);
 				} else {
@@ -299,7 +299,7 @@ namespace Poly2Tri {
 			if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
 
 			if (node.Point.X < edge.P.X) { // needed?
-				if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
+				if (TriangulationUtil.Orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 					// Concave 
 					FillRightConcaveEdgeEvent(tcx, edge, node);
 				} else {
@@ -316,7 +316,7 @@ namespace Poly2Tri {
 			while (node.Next.Point.X < edge.P.X) {
 				if (tcx.IsDebugEnabled) { tcx.DTDebugContext.ActiveNode = node; }
 				// Check if next node is below the edge
-				Orientation o1 = TriangulationUtil.orient2d(edge.Q, node.Next.Point, edge.P);
+				Orientation o1 = TriangulationUtil.Orient2d(edge.Q, node.Next.Point, edge.P);
 				if (o1 == Orientation.CCW) {
 					FillRightBelowEdgeEvent(tcx, edge, node);
 				} else {
@@ -327,13 +327,13 @@ namespace Poly2Tri {
 
 		private static void FillLeftConvexEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			// Next concave or convex?
-			if (TriangulationUtil.orient2d(node.Prev.Point, node.Prev.Prev.Point, node.Prev.Prev.Prev.Point) == Orientation.CW) {
+			if (TriangulationUtil.Orient2d(node.Prev.Point, node.Prev.Prev.Point, node.Prev.Prev.Prev.Point) == Orientation.CW) {
 				// Concave
 				FillLeftConcaveEdgeEvent(tcx, edge, node.Prev);
 			} else {
 				// Convex
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.Q, node.Prev.Prev.Point, edge.P) == Orientation.CW) {
+				if (TriangulationUtil.Orient2d(edge.Q, node.Prev.Prev.Point, edge.P) == Orientation.CW) {
 					// Below
 					FillLeftConvexEdgeEvent(tcx, edge, node.Prev);
 				} else {
@@ -346,9 +346,9 @@ namespace Poly2Tri {
 			Fill(tcx, node.Prev);
 			if (node.Prev.Point != edge.P) {
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.Q, node.Prev.Point, edge.P) == Orientation.CW) {
+				if (TriangulationUtil.Orient2d(edge.Q, node.Prev.Point, edge.P) == Orientation.CW) {
 					// Below
-					if (TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
+					if (TriangulationUtil.Orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
 						// Next is concave
 						FillLeftConcaveEdgeEvent(tcx, edge, node);
 					} else {
@@ -362,7 +362,7 @@ namespace Poly2Tri {
 			if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
 
 			if (node.Point.X > edge.P.X) {
-				if (TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
+				if (TriangulationUtil.Orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
 					// Concave 
 					FillLeftConcaveEdgeEvent(tcx, edge, node);
 				} else {
@@ -379,7 +379,7 @@ namespace Poly2Tri {
 			while (node.Prev.Point.X > edge.P.X) {
 				if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveNode = node;
 				// Check if next node is below the edge
-				Orientation o1 = TriangulationUtil.orient2d(edge.Q, node.Prev.Point, edge.P);
+				Orientation o1 = TriangulationUtil.Orient2d(edge.Q, node.Prev.Point, edge.P);
 				if (o1 == Orientation.CW) {
 					FillLeftBelowEdgeEvent(tcx, edge, node);
 				} else {
@@ -405,7 +405,7 @@ namespace Poly2Tri {
 			if (IsEdgeSideOfTriangle(triangle, ep, eq)) return;
 
 			p1 = triangle.PointCCWFrom(point);
-			Orientation o1 = TriangulationUtil.orient2d(eq, p1, ep);
+			Orientation o1 = TriangulationUtil.Orient2d(eq, p1, ep);
 			if (o1 == Orientation.Collinear) {
 				// TODO: Split edge in two
 				////            splitEdge( ep, eq, p1 );
@@ -416,7 +416,7 @@ namespace Poly2Tri {
 			}
 
 			p2 = triangle.PointCWFrom(point);
-			Orientation o2 = TriangulationUtil.orient2d(eq, p2, ep);
+			Orientation o2 = TriangulationUtil.Orient2d(eq, p2, ep);
 			if (o2 == Orientation.Collinear) {
 				// TODO: Split edge in two
 				//            edgeEvent( tcx, p2, eq, triangle, point );
@@ -480,7 +480,7 @@ namespace Poly2Tri {
 				tcx.DTDebugContext.SecondaryTriangle = ot;
 			} // TODO: remove
 
-			bool inScanArea = TriangulationUtil.inScanArea(p, t.PointCCWFrom(p), t.PointCWFrom(p), op);
+			bool inScanArea = TriangulationUtil.InScanArea(p, t.PointCCWFrom(p), t.PointCWFrom(p), op);
 			if (inScanArea) {
 				// Lets rotate shared edge one vertex CW
 				RotateTrianglePair(t, p, ot, op);
@@ -501,7 +501,7 @@ namespace Poly2Tri {
 					}
 				} else {
 					if (tcx.IsDebugEnabled) Console.WriteLine("[FLIP] - flipping and continuing with triangle still crossing edge"); // TODO: remove
-					Orientation o = TriangulationUtil.orient2d(eq, op, ep);
+					Orientation o = TriangulationUtil.Orient2d(eq, op, ep);
 					t = NextFlipTriangle(tcx, o, t, ot, p, op);
 					FlipEdgeEvent(tcx, ep, eq, t, p);
 				}
@@ -518,7 +518,7 @@ namespace Poly2Tri {
 		/// triangle. 
 		/// </summary>
 		private static TriangulationPoint NextFlipPoint( TriangulationPoint ep, TriangulationPoint eq, DelaunayTriangle ot, TriangulationPoint op ) {
-			Orientation o2d = TriangulationUtil.orient2d(eq, op, ep);
+			Orientation o2d = TriangulationUtil.Orient2d(eq, op, ep);
 			switch ( o2d ) {
 			case Orientation.CW: return ot.PointCCWFrom(op);
 			case Orientation.CCW: return ot.PointCWFrom(op);
@@ -591,7 +591,7 @@ namespace Poly2Tri {
 				tcx.DTDebugContext.SecondaryTriangle = ot;
 			}
 
-			inScanArea = TriangulationUtil.inScanArea(eq, flipTriangle.PointCCWFrom(eq), flipTriangle.PointCWFrom(eq), op);
+			inScanArea = TriangulationUtil.InScanArea(eq, flipTriangle.PointCCWFrom(eq), flipTriangle.PointCWFrom(eq), op);
 			if (inScanArea) {
 				// flip with new edge op->eq
 				FlipEdgeEvent(tcx, eq, op, ot, op);
@@ -649,7 +649,7 @@ namespace Poly2Tri {
 		/// <param name="tcx"></param>
 		/// <param name="node">starting node, this or next node will be left node</param>
 		private static void FillBasin( DTSweepContext tcx, AdvancingFrontNode node ) {
-			if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
+			if (TriangulationUtil.Orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 				// tcx.basin.leftNode = node.next.next;
 				tcx.Basin.leftNode = node;
 			} else {
@@ -683,11 +683,11 @@ namespace Poly2Tri {
 			if (node.Prev == tcx.Basin.leftNode && node.Next == tcx.Basin.rightNode) {
 				return;
 			} else if (node.Prev == tcx.Basin.leftNode) {
-				Orientation o = TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point);
+				Orientation o = TriangulationUtil.Orient2d(node.Point, node.Next.Point, node.Next.Next.Point);
 				if (o == Orientation.CW) return;
 				node = node.Next;
 			} else if (node.Next == tcx.Basin.rightNode) {
-				Orientation o = TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point);
+				Orientation o = TriangulationUtil.Orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point);
 				if (o == Orientation.CCW) return;
 				node = node.Prev;
 			} else {
@@ -795,7 +795,7 @@ namespace Poly2Tri {
 					continue;
 				}
 
-				if (!TriangulationUtil.smartIncircle(p,t.PointCCWFrom(p),t.PointCWFrom(p),op)) continue;
+				if (!TriangulationUtil.SmartIncircle(p,t.PointCCWFrom(p),t.PointCWFrom(p),op)) continue;
 
 				// Lets mark this shared edge as Delaunay 
 				t.EdgeIsDelaunay[i] = true;
