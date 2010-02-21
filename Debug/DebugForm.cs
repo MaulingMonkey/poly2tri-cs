@@ -92,6 +92,8 @@ namespace Poly2Tri {
 				LineY=10;
 				AddText(fx,"Name: "+Info.Name);
 				AddText(fx,"Triangulation time: "+Info.LastTriangulationDuration.TotalMilliseconds.ToString("N0")+"ms");
+				AddText(fx,"Points: "+Info.Polygon.Points.Count);
+				AddText(fx,"Triangles: "+Info.Polygon.Triangles.Count);
 			}
 
 			Invalidate();
