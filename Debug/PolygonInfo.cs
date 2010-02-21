@@ -46,7 +46,7 @@ namespace Poly2Tri {
 		}
 
 		static Polygon CleanClone( Polygon polygon ) {
-			var n = new Polygon(polygon.Points.Cast<PolygonPoint>());
+			var n = new Polygon(polygon.Points.Select( p => new PolygonPoint(p.X,p.Y) ) );
 			if ( polygon.Holes!=null ) foreach ( var hole in polygon.Holes ) n.AddHole(CleanClone(hole));
 			return n;
 		}

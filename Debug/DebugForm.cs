@@ -56,6 +56,17 @@ namespace Poly2Tri {
 			LineY += TextRenderer.MeasureText( text, Font ).Height;
 		}
 
+		protected override void OnKeyDown( KeyEventArgs e ) {
+			e.Handled = true;
+			switch ( e.KeyCode ) {
+			case Keys.G: GC.GetTotalMemory(true); break;
+			default:
+				e.Handled = false;
+				base.OnKeyDown(e);
+				break;
+			}
+		}
+
 		protected override void OnPaint( PaintEventArgs e ) {
 			var fx = e.Graphics;
 			fx.Clear( BackColor );
@@ -94,6 +105,10 @@ namespace Poly2Tri {
 				AddText(fx,"Triangulation time: "+Info.LastTriangulationDuration.TotalMilliseconds.ToString("N0")+"ms");
 				AddText(fx,"Points: "+Info.Polygon.Points.Count);
 				AddText(fx,"Triangles: "+Info.Polygon.Triangles.Count);
+				AddText(fx,"Memory: "+(GC.GetTotalMemory(false)/1000000).ToString("N0")+"MB");
+				string s = "Collections: ";
+				for ( int i=0, g=GC.MaxGeneration ; i < g ; ++i ) s = s + "    Gen "+i+": "+GC.CollectionCount(i);
+				AddText(fx,s);
 			}
 
 			Invalidate();
