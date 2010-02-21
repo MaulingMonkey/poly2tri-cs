@@ -48,6 +48,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Poly2Tri {
 	public static class DTSweep {
@@ -99,7 +100,7 @@ namespace Poly2Tri {
 
 				node = PointEvent(tcx, point);
 
-				if (point.hasEdges()) foreach (DTSweepConstraint e in point.getEdges()) {
+				if (point.HasEdges) foreach (DTSweepConstraint e in point.Edges) {
 					if (tcx.IsDebugEnabled) tcx.DTDebugContext.ActiveConstraint = e;
 					EdgeEvent(tcx, e, node);
 				}
@@ -454,7 +455,7 @@ namespace Poly2Tri {
 		/// <param name="eq"></param>
 		/// <param name="p">point on the edge between ep->eq</param>
 		private static void SplitEdge( TriangulationPoint ep, TriangulationPoint eq, TriangulationPoint p ) {
-			DTSweepConstraint edge = eq.getEdge(ep);
+			DTSweepConstraint edge = eq.Edges.First( e => e.Q==ep || e.P==ep );
 			edge.P = p;
 			new DTSweepConstraint(ep, p); // Et tu, Brute? --MM
 

@@ -29,10 +29,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
+
 namespace Poly2Tri {
 	public class TriangulationPoint {
 		// List of edges this point constitutes an upper ending point (CDT)
-		private ArrayList<DTSweepConstraint> edges;
+		public List<DTSweepConstraint> Edges { get; private set; }
 
 		public TriangulationPoint( double x, double y ) { X=x; Y=y; }
 
@@ -44,46 +46,11 @@ namespace Poly2Tri {
 		public float Xf { get { return (float)X; } set { X=value; } }
 		public float Yf { get { return (float)Y; } set { Y=value; } }
 
-		public ArrayList<DTSweepConstraint> getEdges() {
-			return edges;
+		public void AddEdge(DTSweepConstraint e) {
+			if (Edges == null) Edges = new List<DTSweepConstraint>();
+			Edges.Add(e);
 		}
 
-		public void addEdge(DTSweepConstraint e) {
-			if (edges == null) {
-				edges = new ArrayList<DTSweepConstraint>();
-			}
-			edges.add(e);
-		}
-
-		public bool hasEdges() {
-			return edges != null;
-		}
-
-		/**
-		 * @param p - edge destination point
-		 * @return the edge from this point to given point
-		 */
-		public DTSweepConstraint getEdge(TriangulationPoint p) {
-			foreach (DTSweepConstraint c in edges) {
-				if (c.P == p) {
-					return c;
-				}
-			}
-			return null;
-		}
-
-		//public override bool Equals(object obj) {
-		//    if (obj is TriangulationPoint) {
-		//        TriangulationPoint p = (TriangulationPoint)obj;
-		//        return getX() == p.X && getY() == p.Y;
-		//    }
-		//    return base.Equals(obj);
-		//}
-
-		//public override int GetHashCode() {
-		//    long bits = BitConverter java.lang.Double.doubleToLongBits(getX());
-		//    bits ^= java.lang.Double.doubleToLongBits(getY()) * 31;
-		//    return (((int)bits) ^ ((int)(bits >> 32)));
-		//}
+		public bool HasEdges { get { return Edges != null; } }
 	}
 }

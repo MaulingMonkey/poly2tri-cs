@@ -51,7 +51,7 @@ namespace Poly2Tri {
 					//                return;
 				}
 			}
-			Q.addEdge(this);
+			Q.AddEdge(this);
 		}
 	}
 }
