@@ -29,10 +29,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using System.IO;
-using System.Drawing;
 using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 
 namespace Poly2Tri {
 	public static class ExampleData {
@@ -75,7 +75,7 @@ namespace Poly2Tri {
 		public static List<PolygonPoint> Dude        { get { return CacheLoadDat(@"Data\dude.dat"); } }
 		public static List<PolygonPoint> Funny       { get { return CacheLoadDat(@"Data\funny.dat"); } }
 		public static List<PolygonPoint> NazcaHeron  { get { return CacheLoadDat(@"Data\nazca_heron.dat"); } }
-		public static List<PolygonPoint> NazcaMonkey { get { return CacheLoadDat(@"Data\nazca_monkey.dat"); } }
+		public static List<PolygonPoint> NazcaMonkey { get { return CacheLoadDat(@"Data\nazca_monkey.dat",false,true); } }
 		public static List<PolygonPoint> Sketchup    { get { return CacheLoadDat(@"Data\sketchup.dat"); } }
 		public static List<PolygonPoint> Star        { get { return CacheLoadDat(@"Data\star.dat"); } }
 		public static List<PolygonPoint> Strange     { get { return CacheLoadDat(@"Data\strange.dat"); } }

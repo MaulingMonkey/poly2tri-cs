@@ -413,7 +413,7 @@ namespace Poly2Tri {
 				//            edgeEvent( tcx, p1, eq, triangle, point );
 				//            edgeEvent( tcx, ep, p1, triangle, p1 );
 				//            return;
-				throw new PointOnEdgeException("EdgeEvent - Point on constrained edge not supported yet");
+				throw new PointOnEdgeException("EdgeEvent - Point on constrained edge not supported yet",eq,p1,ep);
 			}
 
 			p2 = triangle.PointCWFrom(point);
@@ -423,7 +423,7 @@ namespace Poly2Tri {
 				//            edgeEvent( tcx, p2, eq, triangle, point );
 				//            edgeEvent( tcx, ep, p2, triangle, p2 );
 				//            return;
-				throw new PointOnEdgeException("EdgeEvent - Point on constrained edge not supported yet");
+				throw new PointOnEdgeException("EdgeEvent - Point on constrained edge not supported yet",eq,p2,ep);
 			}
 
 			if (o1 == o2) {
@@ -525,7 +525,7 @@ namespace Poly2Tri {
 			case Orientation.CCW: return ot.PointCWFrom(op);
 			case Orientation.Collinear:
 				// TODO: implement support for point on constraint edge
-				throw new PointOnEdgeException("Point on constrained edge not supported yet");
+				throw new PointOnEdgeException("Point on constrained edge not supported yet",eq,op,ep);
 			default:
 				throw new NotImplementedException("Orientation not handled");
 			}

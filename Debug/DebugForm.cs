@@ -30,11 +30,11 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Poly2Tri {
 	[System.ComponentModel.DesignerCategory("")] class DebugForm : Form {
@@ -120,29 +120,73 @@ namespace Poly2Tri {
 			}
 			else
 			using ( var pointpen = new Pen( Color.White, 1.0f ) )
+			using ( var outlinepen = new Pen( Color.Blue, 3.0f ) )
+			using ( var tripen = new Pen( Color.Green, 1.0f ) )
+			using ( var poeepen = new Pen( Color.Red, 10.0f ) )
+			using ( var boblinepen = new Pen( Color.Blue, 10.0f ) )
 			{
+				foreach ( var pen in new[] { pointpen, outlinepen, tripen, poeepen, boblinepen } ) {
+					pen.StartCap = pen.EndCap = LineCap.Round;
+					pen.LineJoin = LineJoin.Round;
+				}
+
 				var now = DateTime.Now;
 
 				Info.Triangulate();
 
 				fx.SmoothingMode = SmoothingMode.AntiAlias;
-				fx.TranslateTransform(400,300);
+				fx.TranslateTransform(ClientSize.Width/2,ClientSize.Height/2);
 
-				double bounce = (now-PointBounceStart).TotalSeconds*5;
+				float bounce = (float)((now-PointBounceStart).TotalSeconds*5);
 				if ( bounce > 1 ) {
 					bounce = 0;
 					PointBounceStart = now;
 					++PointBounceIndex;
 				}
 
+				float xmin = float.MaxValue, xmax = float.MinValue;
+				float ymin = float.MaxValue, ymax = float.MinValue;
+
+				if ( Info.Polygon.Points != null ) foreach ( var point in Info.Polygon.Points ) {
+					xmin = Math.Min(xmin,point.Xf);
+					xmax = Math.Max(xmax,point.Xf);
+					ymin = Math.Min(ymin,point.Yf);
+					ymax = Math.Max(ymax,point.Yf);
+				}
+
+				float zoom = 0.8f * Math.Min(ClientSize.Width/(xmax-xmin),ClientSize.Height/(ymax-ymin));
+				float xmid = (xmin+xmax)/2;
+				float ymid = (ymin+ymax)/2;
+
+				Func<TriangulationPoint,PointF> f = (p) => new PointF( (p.Xf-xmid)*zoom, (p.Yf-ymid)*zoom );
+
 				if ( Info.Polygon.Points != null ) {
 					PointBounceIndex %= Info.Polygon.Points.Count;
+					fx.DrawPolygon( outlinepen, Info.Polygon.Points.Select(f).ToArray() );
+					boblinepen.Width = 3.0f + 9-9*bounce;
+					fx.DrawLine( boblinepen, f(Info.Polygon.Points[(PointBounceIndex+Info.Polygon.Points.Count-1)%Info.Polygon.Points.Count]), f(Info.Polygon.Points[PointBounceIndex]) );
+				}
+
+				if ( Info.Polygon.Triangles != null )
+				foreach ( var tri in Info.Polygon.Triangles )
+				{
+					fx.DrawPolygon( tripen, tri.Points.Select(f).ToArray() );
+				}
+
+				if ( Info.Polygon.Points != null ) {
 					for ( int i = 0 ; i < Info.Polygon.Points.Count ; ++i ) {
-						var point = Info.Polygon.Points[i];
+						var point = f(Info.Polygon.Points[i]);
 						float r = 2.0f;
-						if ( PointBounceIndex==i ) r += (float)(2-2*bounce);
-						fx.DrawEllipse( pointpen, 20*point.Xf-r, 20*point.Yf-r, 2*r, 2*r );
+						if ( PointBounceIndex==i ) r += 2-2*bounce;
+						fx.DrawEllipse( pointpen, point.X-r, point.Y-r, 2*r, 2*r );
 					}
+				}
+
+				var poee = Info.LastTriangulationException as PointOnEdgeException;
+				if ( poee != null ) {
+					var line = new PointF[] { f(poee.A), f(poee.B), f(poee.C) };
+					fx.DrawLines( poeepen, line );
+					foreach ( var p in line ) fx.DrawEllipse( poeepen, p.X-2, p.Y-2, 4, 4 );
 				}
 
 				LineY=10;
