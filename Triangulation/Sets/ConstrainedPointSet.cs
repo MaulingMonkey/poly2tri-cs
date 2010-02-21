@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+using System.Collections.Generic;
 namespace Poly2Tri {
 	/*
 	 * Extends the PointSet by adding some Constraints on how it will be triangulated<br>
@@ -42,7 +43,7 @@ namespace Poly2Tri {
 	public class ConstrainedPointSet : PointSet {
 		public int[] EdgeIndex { get; private set; }
 
-		public ConstrainedPointSet(ArrayList<TriangulationPoint> points, int[] index)
+		public ConstrainedPointSet(List<TriangulationPoint> points, int[] index)
 			: base(points) {
 			EdgeIndex = index;
 		}

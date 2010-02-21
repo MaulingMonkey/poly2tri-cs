@@ -36,6 +36,7 @@
 ///   Comments comments and more comments!
 
 using System.Text;
+using System;
 
 namespace Poly2Tri {
 	/**
@@ -117,7 +118,7 @@ namespace Poly2Tri {
 					} else if (point == node.Next.Point) {
 						node = node.Next;
 					} else {
-						throw new RuntimeException("Failed to find Node for given afront point");
+						throw new Exception("Failed to find Node for given afront point");
 					}
 				}
 			} else if (px < nx) {

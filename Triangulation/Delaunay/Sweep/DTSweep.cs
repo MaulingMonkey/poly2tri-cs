@@ -582,7 +582,7 @@ namespace Poly2Tri {
 			if (ot == null) {
 				// If we want to integrate the fillEdgeEvent do it here
 				// With current implementation we should never get here
-				throw new RuntimeException("[BUG:FIXME] FLIP failed due to missing triangle");
+				throw new Exception("[BUG:FIXME] FLIP failed due to missing triangle");
 			}
 
 			if (tcx.IsDebugEnabled) {

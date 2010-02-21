@@ -33,7 +33,7 @@
 ///   Polygon constructors sprused up, checks for 3+ polys
 ///   Naming of everything
 ///   getTriangulationMode() -> TriangulationMode { get; }
-///   RuntimeExceptions replaced
+///   Exceptions replaced
 /// Future possibilities
 ///   We have a lot of Add/Clear methods -- we may prefer to just expose the container
 ///   Some self-explanitory methods may deserve commenting anyways
@@ -44,10 +44,10 @@ using System.Linq;
 
 namespace Poly2Tri {
 	public class Polygon : Triangulatable {
-		protected ArrayList<TriangulationPoint> _points = new ArrayList<TriangulationPoint>();
-		protected ArrayList<TriangulationPoint> _steinerPoints;
-		protected ArrayList<Polygon> _holes;
-		protected ArrayList<DelaunayTriangle> _triangles;
+		protected List<TriangulationPoint> _points = new List<TriangulationPoint>();
+		protected List<TriangulationPoint> _steinerPoints;
+		protected List<Polygon> _holes;
+		protected List<DelaunayTriangle> _triangles;
 		protected PolygonPoint _last;
 
 		/// <summary>
@@ -61,7 +61,7 @@ namespace Poly2Tri {
 			// Its something that often happen when importing polygon data from other formats
 			if (points[0].Equals(points[points.Count - 1])) points.RemoveAt(points.Count - 1);
 
-			_points.addAll(points);
+			_points.AddRange(points.Cast<TriangulationPoint>());
 		}
 
 		/// <summary>
@@ -79,17 +79,17 @@ namespace Poly2Tri {
 		public TriangulationMode TriangulationMode { get { return TriangulationMode.Polygon; } }
 
 		public void AddSteinerPoint( TriangulationPoint point ) {
-			if (_steinerPoints == null) _steinerPoints = new ArrayList<TriangulationPoint>();
-			_steinerPoints.add(point);
+			if (_steinerPoints == null) _steinerPoints = new List<TriangulationPoint>();
+			_steinerPoints.Add(point);
 		}
 
 		public void AddSteinerPoints( List<TriangulationPoint> points ) {
-			if (_steinerPoints == null) _steinerPoints = new ArrayList<TriangulationPoint>();
-			_steinerPoints.addAll(points);
+			if (_steinerPoints == null) _steinerPoints = new List<TriangulationPoint>();
+			_steinerPoints.AddRange(points);
 		}
 
 		public void ClearSteinerPoints() {
-			if (_steinerPoints != null) _steinerPoints.clear();
+			if (_steinerPoints != null) _steinerPoints.Clear();
 		}
 
 		/// <summary>
@@ -97,8 +97,8 @@ namespace Poly2Tri {
 		/// </summary>
 		/// <param name="poly">A subtraction polygon fully contained inside this polygon.</param>
 		public void AddHole( Polygon poly ) {
-			if (_holes == null) _holes = new ArrayList<Polygon>();
-			_holes.add(poly);
+			if (_holes == null) _holes = new List<Polygon>();
+			_holes.Add(poly);
 			// XXX: tests could be made here to be sure it is fully inside
 			//        addSubtraction( poly.getPoints() );
 		}
@@ -110,13 +110,13 @@ namespace Poly2Tri {
 		/// <param name="newPoint">The point to insert into the polygon</param>
 		public void InsertPointAfter( PolygonPoint point, PolygonPoint newPoint ) {
 			// Validate that 
-			int index = _points.indexOf(point);
+			int index = _points.IndexOf(point);
 			if (index == -1) throw new ArgumentException("Tried to insert a point into a Polygon after a point not belonging to the Polygon", "point");
 			newPoint.Next = point.Next;
 			newPoint.Previous = point;
 			point.Next.Previous = newPoint;
 			point.Next = newPoint;
-			_points.add(index + 1, newPoint);
+			_points.Insert(index + 1, newPoint);
 		}
 
 		/// <summary>
@@ -132,9 +132,9 @@ namespace Poly2Tri {
 					_last.Next = p;
 				}
 				_last = p;
-				_points.add(p);
+				_points.Add(p);
 			}
-			first = (PolygonPoint)_points.get(0);
+			first = (PolygonPoint)_points[0];
 			_last.Next = first;
 			first.Previous = _last;
 		}
@@ -147,7 +147,7 @@ namespace Poly2Tri {
 			p.Previous = _last;
 			p.Next = _last.Next;
 			_last.Next = p;
-			_points.add(p);
+			_points.Add(p);
 		}
 
 		/// <summary>
@@ -161,24 +161,22 @@ namespace Poly2Tri {
 			prev = p.Previous;
 			prev.Next = next;
 			next.Previous = prev;
-			_points.remove(p);
+			_points.Remove(p);
 		}
 
 		public IList<TriangulationPoint> Points { get { return _points; } }
 		public IList<DelaunayTriangle> Triangles { get { return _triangles; } }
 
 		public void AddTriangle( DelaunayTriangle t ) {
-			_triangles.add(t);
+			_triangles.Add(t);
 		}
 
 		public void AddTriangles( IEnumerable<DelaunayTriangle> list ) {
-			_triangles.addAll(list);
+			_triangles.AddRange(list);
 		}
 
 		public void ClearTriangles() {
-			if (_triangles != null) {
-				_triangles.clear();
-			}
+			if (_triangles != null) _triangles.Clear();
 		}
 
 		/// <summary>
@@ -187,23 +185,21 @@ namespace Poly2Tri {
 		/// <param name="tcx">The context</param>
 		public void Prepare( TriangulationContext tcx ) {
 			if (_triangles == null) {
-				_triangles = new ArrayList<DelaunayTriangle>(_points.size());
+				_triangles = new List<DelaunayTriangle>(_points.Count);
 			} else {
-				_triangles.clear();
+				_triangles.Clear();
 			}
 
 			// Outer constraints
-			for (int i = 0; i < _points.size() - 1; i++) tcx.NewConstraint(_points.get(i), _points.get(i + 1));
-			tcx.NewConstraint(_points.get(0), _points.get(_points.size() - 1));
+			for (int i = 0; i < _points.Count - 1; i++) tcx.NewConstraint(_points[i], _points[i + 1]);
+			tcx.NewConstraint(_points[0], _points[_points.Count - 1]);
 			tcx.Points.AddRange(_points);
 
 			// Hole constraints
 			if (_holes != null) {
 				foreach (Polygon p in _holes) {
-					for (int i = 0; i < p._points.size() - 1; i++) {
-						tcx.NewConstraint(p._points.get(i), p._points.get(i + 1));
-					}
-					tcx.NewConstraint(p._points.get(0), p._points.get(p._points.size() - 1));
+					for (int i = 0; i < p._points.Count - 1; i++) tcx.NewConstraint(p._points[i], p._points[i + 1]);
+					tcx.NewConstraint(p._points[0], p._points[p._points.Count - 1]);
 					tcx.Points.AddRange(p._points);
 				}
 			}

@@ -36,7 +36,7 @@ namespace Poly2Tri {
 		public IList<TriangulationPoint> Points { get; private set; }
 		public IList<DelaunayTriangle> Triangles { get; private set; }
 
-		public PointSet(ArrayList<TriangulationPoint> points) {
+		public PointSet(List<TriangulationPoint> points) {
 			Points = new List<TriangulationPoint>(points);
 		}
 

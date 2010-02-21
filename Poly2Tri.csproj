@@ -42,7 +42,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="evil\evil.cs" />
     <Compile Include="Poly2Tri.cs" />
     <Compile Include="Polygon\Polygon.cs" />
     <Compile Include="Polygon\PolygonPoint.cs" />

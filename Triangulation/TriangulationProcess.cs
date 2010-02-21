@@ -32,7 +32,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-
+using System.Linq;
 using boolean = System.Boolean;
 
 namespace Poly2Tri {
@@ -55,20 +55,20 @@ namespace Poly2Tri {
 		private boolean _awaitingTermination;
 		private boolean _restart = false;
 
-		private ArrayList<Triangulatable> _triangulations = new ArrayList<Triangulatable>();
+		private List<Triangulatable> _triangulations = new List<Triangulatable>();
 
-		private ArrayList<TriangulationProcessListener> _listeners = new ArrayList<TriangulationProcessListener>();
+		private List<TriangulationProcessListener> _listeners = new List<TriangulationProcessListener>();
 
 		public void addListener(TriangulationProcessListener listener) {
-			_listeners.add(listener);
+			_listeners.Add(listener);
 		}
 
 		public void removeListener(TriangulationProcessListener listener) {
-			_listeners.remove(listener);
+			_listeners.Remove(listener);
 		}
 
 		public void clearListeners() {
-			_listeners.clear();
+			_listeners.Clear();
 		}
 
 		/**
@@ -121,8 +121,8 @@ namespace Poly2Tri {
 		 * @param cps
 		 */
 		public void triangulate(PointSet ps) {
-			_triangulations.clear();
-			_triangulations.add(ps);
+			_triangulations.Clear();
+			_triangulations.Add(ps);
 			start();
 		}
 
@@ -132,8 +132,8 @@ namespace Poly2Tri {
 		 * @param cps
 		 */
 		public void triangulate(ConstrainedPointSet cps) {
-			_triangulations.clear();
-			_triangulations.add(cps);
+			_triangulations.Clear();
+			_triangulations.Add(cps);
 			start();
 		}
 
@@ -143,8 +143,8 @@ namespace Poly2Tri {
 		 * @param ps
 		 */
 		public void triangulate(PolygonSet ps) {
-			_triangulations.clear();
-			_triangulations.addAll(ps.Polygons);
+			_triangulations.Clear();
+			_triangulations.AddRange(ps.Polygons.Cast<Triangulatable>());
 			start();
 		}
 
@@ -154,8 +154,8 @@ namespace Poly2Tri {
 		 * @param ps
 		 */
 		public void triangulate(Polygon polygon) {
-			_triangulations.clear();
-			_triangulations.add(polygon);
+			_triangulations.Clear();
+			_triangulations.Add(polygon);
 			start();
 		}
 
@@ -165,8 +165,8 @@ namespace Poly2Tri {
 		 * @param ps
 		 */
 		public void triangulate(List<Triangulatable> list) {
-			_triangulations.clear();
-			_triangulations.addAll(list);
+			_triangulations.Clear();
+			_triangulations.AddRange(list);
 			start();
 		}
 
@@ -198,7 +198,7 @@ namespace Poly2Tri {
 				_triangulationTime = (DateTime.Now - time).TotalMilliseconds;
 				//logger.info( "Triangulation of {} points [{}ms]", _pointCount, _triangulationTime );
 				sendEvent(TriangulationProcessEvent.Done);
-			} catch (RuntimeException) {
+			} catch (Exception) {
 				if (_awaitingTermination) {
 					_awaitingTermination = false;
 					//logger.info( "Thread[{}] : {}", _thread.getName(), e.getMessage() );
@@ -207,10 +207,6 @@ namespace Poly2Tri {
 					//e.printStackTrace();
 					sendEvent(TriangulationProcessEvent.Failed);
 				}
-			} catch (Exception) {
-				//e.printStackTrace();
-				//logger.info( "Triangulation exception {}", e.getMessage() );
-				sendEvent(TriangulationProcessEvent.Failed);
 			} finally {
 				_timestamp = DateTime.Now;
 				_isTerminated = true;

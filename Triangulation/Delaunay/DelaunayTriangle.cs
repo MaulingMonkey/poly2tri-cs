@@ -40,6 +40,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Poly2Tri {
 	public class DelaunayTriangle {
@@ -56,7 +57,7 @@ namespace Poly2Tri {
 
 		public int IndexOf(TriangulationPoint p) {
 			int i = Points.IndexOf(p);
-			if (i==-1) throw new RuntimeException("Calling index with a point that doesn't exist in triangle");
+			if (i==-1) throw new Exception("Calling index with a point that doesn't exist in triangle");
 			return i;
 		}
 
@@ -140,7 +141,7 @@ namespace Poly2Tri {
 			}
 		}
 
-		public void MarkEdge(ArrayList<DelaunayTriangle> tList) {
+		public void MarkEdge(List<DelaunayTriangle> tList) {
 			foreach ( DelaunayTriangle t in tList )
 			for ( int i = 0; i < 3; i++ )
 			if ( t.EdgeIsConstrained[i] )
