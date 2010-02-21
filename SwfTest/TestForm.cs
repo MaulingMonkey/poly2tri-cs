@@ -51,11 +51,13 @@ namespace SwfTest {
 			Visible = true;
 
 			Polygons = new List<Polygon>( ExampleData.Polygons.Select( data => new Polygon(data) ) );
-			foreach ( var poly in Polygons ) P2T.Triangulate(poly);
+			foreach ( var poly in Polygons ) try {
+				P2T.Triangulate(poly);
+			} catch ( Exception ) {}
 
 			rotation = new Timer()
 				{ Enabled = true
-				, Interval = 5000
+				, Interval = 500
 				};
 			rotation.Tick += (o,e) => {
 				i = (i+1)%Polygons.Count;

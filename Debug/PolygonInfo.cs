@@ -36,6 +36,7 @@ namespace Poly2Tri {
 	class PolygonInfo {
 		public string Name { get; private set; }
 		public TimeSpan LastTriangulationDuration { get; private set; }
+		public Exception LastTriangulationException { get; private set; }
 
 		public Polygon Polygon { get; private set; }
 
@@ -53,11 +54,16 @@ namespace Poly2Tri {
 
 		public void Triangulate() {
 			var start = DateTime.Now;
-			var newpoly = CleanClone(Polygon);
-			P2T.Triangulate(newpoly);
+			try {
+				LastTriangulationException = null;
+				var newpoly = CleanClone(Polygon);
+				P2T.Triangulate(newpoly);
+				Polygon = newpoly;
+			} catch ( Exception e ) {
+				LastTriangulationException = e;
+			}
 			var stop = DateTime.Now;
 			LastTriangulationDuration = (stop-start);
-			Polygon = newpoly;
 		}
 	}
 }

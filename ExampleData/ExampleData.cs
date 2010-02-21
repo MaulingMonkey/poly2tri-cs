@@ -36,23 +36,27 @@ using System;
 
 namespace Poly2Tri {
 	public static class ExampleData {
-		public static List<PolygonPoint> LoadDat( string filename ) {
+		public static List<PolygonPoint> LoadDat( string filename, bool xflip, bool yflip ) {
 			var points = new List<PolygonPoint>();
 			foreach ( var line_ in File.ReadAllLines(filename) ) {
 				string line = line_.Trim();
 				if ( string.IsNullOrEmpty(line) ) continue;
 				var xy = line.Split( new[]{' ',','}, StringSplitOptions.RemoveEmptyEntries );
-				points.Add( new PolygonPoint( double.Parse(xy[0]), double.Parse(xy[1]) ) );
+				points.Add( new PolygonPoint( (xflip?-1:+1) * double.Parse(xy[0]), (yflip?-1:+1) * double.Parse(xy[1]) ) );
 			}
 			return points;
 		}
 
+		public static List<PolygonPoint> LoadDat( string filename ) { return LoadDat(filename,false,false); }
+
 		static readonly Dictionary<string,List<PolygonPoint>> DatCache = new Dictionary<string,List<PolygonPoint>>();
 
-		static List<PolygonPoint> CacheLoadDat( string filename ) {
-			if (!DatCache.ContainsKey(filename)) DatCache.Add( filename, LoadDat(filename) );
+		static List<PolygonPoint> CacheLoadDat( string filename, bool xflip, bool yflip ) {
+			if (!DatCache.ContainsKey(filename)) DatCache.Add( filename, LoadDat(filename,xflip,yflip) );
 			return DatCache[filename];
 		}
+
+		static List<PolygonPoint> CacheLoadDat( string filename ) { return CacheLoadDat(filename,false,false); }
 
 		static readonly Dictionary<string,Image> ImageCache = new Dictionary<string,Image>();
 
@@ -61,8 +65,9 @@ namespace Poly2Tri {
 			return ImageCache[filename];
 		}
 
+		// These should all use +x = right, +y = up
 		public static List<PolygonPoint> Two         { get { return CacheLoadDat(@"Data\2.dat"); } }
-		public static List<PolygonPoint> Bird        { get { return CacheLoadDat(@"Data\bird.dat"); } }
+		public static List<PolygonPoint> Bird        { get { return CacheLoadDat(@"Data\bird.dat",false,true); } }
 		public static List<PolygonPoint> Custom      { get { return CacheLoadDat(@"Data\custom.dat"); } }
 		public static List<PolygonPoint> Debug       { get { return CacheLoadDat(@"Data\debug.dat"); } }
 		public static List<PolygonPoint> Debug2      { get { return CacheLoadDat(@"Data\debug2.dat"); } }
@@ -77,12 +82,7 @@ namespace Poly2Tri {
 		public static List<PolygonPoint> Tank        { get { return CacheLoadDat(@"Data\tank.dat"); } }
 		public static List<PolygonPoint> Test        { get { return CacheLoadDat(@"Data\test.dat"); } }
 
-		public static IEnumerable<List<PolygonPoint>> Polygons { get { return new[]
-			{ Two, Bird, Custom, Debug, Debug2, Diamond, Dude, Funny, NazcaHeron, NazcaMonkey
-			//, Sketchup
-			, Star, Strange, Tank, Test
-			};
-		}}
+		public static IEnumerable<List<PolygonPoint>> Polygons { get { return new[] { Two, Bird, Custom, Debug, Debug2, Diamond, Dude, Funny, NazcaHeron, NazcaMonkey, Sketchup, Star, Strange, Tank, Test }; }}
 
 		public static Image Logo256x256 { get { return CacheLoadImage(@"Textures\poly2tri_logotype_256x256.png"); } }
 	}

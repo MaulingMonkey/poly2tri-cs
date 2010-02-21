@@ -33,10 +33,31 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Poly2Tri {
 	[System.ComponentModel.DesignerCategory("")] class DebugForm : Form {
-		PolygonInfo Info = new PolygonInfo( "Bird", new Polygon(ExampleData.Bird) );
+		List<PolygonInfo> Infos = new List<PolygonInfo>()
+			{ new PolygonInfo( "Two", new Polygon(ExampleData.Two ))
+			, new PolygonInfo( "Bird", new Polygon(ExampleData.Bird ))
+			, new PolygonInfo( "Custom", new Polygon(ExampleData.Custom ))
+			, new PolygonInfo( "Debug", new Polygon(ExampleData.Debug ))
+			, new PolygonInfo( "Debug2", new Polygon(ExampleData.Debug2 ))
+			, new PolygonInfo( "Diamond", new Polygon(ExampleData.Diamond ))
+			, new PolygonInfo( "Dude", new Polygon(ExampleData.Dude ))
+			, new PolygonInfo( "Funny", new Polygon(ExampleData.Funny ))
+			, new PolygonInfo( "NazcaHeron", new Polygon(ExampleData.NazcaHeron ))
+			, new PolygonInfo( "NazcaMonkey", new Polygon(ExampleData.NazcaMonkey ))
+			, new PolygonInfo( "Sketchup", new Polygon(ExampleData.Sketchup ))
+			, new PolygonInfo( "Star", new Polygon(ExampleData.Star ))
+			, new PolygonInfo( "Strange", new Polygon(ExampleData.Strange ))
+			, new PolygonInfo( "Tank", new Polygon(ExampleData.Tank ))
+			, new PolygonInfo( "Test", new Polygon(ExampleData.Test ))
+			};
+
+		int InfoI = 0;
+		public PolygonInfo Info { get { return Infos[InfoI]; } }
 
 		DateTime PointBounceStart = DateTime.Now;
 		int      PointBounceIndex;
@@ -56,10 +77,33 @@ namespace Poly2Tri {
 			LineY += TextRenderer.MeasureText( text, Font ).Height;
 		}
 
+		void AddText( Graphics fx, string format, params object[] args ) { AddText(fx,String.Format(format,args)); }
+
+		void AddText( Graphics fx, Exception e ) {
+			if ( e == null ) return;
+
+			string text = "Exception: "+e.Message;
+			TextRenderer.DrawText( fx, text, Font, new Point(10,LineY), Color.Red );
+			LineY += TextRenderer.MeasureText( text, Font ).Height;
+
+			while ( e.InnerException != null ) {
+				e = e.InnerException;
+				text = "Innert Exception: "+e.Message;
+				TextRenderer.DrawText( fx, text, Font, new Point(10,LineY), Color.Red );
+				LineY += TextRenderer.MeasureText( text, Font ).Height;
+			}
+		}
+
 		protected override void OnKeyDown( KeyEventArgs e ) {
 			e.Handled = true;
 			switch ( e.KeyCode ) {
 			case Keys.G: GC.GetTotalMemory(true); break;
+			case Keys.Left:
+				if ( --InfoI < 0 ) InfoI += Infos.Count;
+				break;
+			case Keys.Right:
+				if ( ++InfoI >= Infos.Count ) InfoI -= Infos.Count;
+				break;
 			default:
 				e.Handled = false;
 				base.OnKeyDown(e);
@@ -91,24 +135,30 @@ namespace Poly2Tri {
 					++PointBounceIndex;
 				}
 
-				PointBounceIndex %= Info.Polygon.Points.Count;
-
-				for ( int i = 0 ; i < Info.Polygon.Points.Count ; ++i ) {
-					var point = Info.Polygon.Points[i];
-					float r = 2.0f;
-					if ( PointBounceIndex==i ) r += (float)(2-2*bounce);
-					fx.DrawEllipse( pointpen, 20*point.Xf-r, 20*point.Yf-r, 2*r, 2*r );
+				if ( Info.Polygon.Points != null ) {
+					PointBounceIndex %= Info.Polygon.Points.Count;
+					for ( int i = 0 ; i < Info.Polygon.Points.Count ; ++i ) {
+						var point = Info.Polygon.Points[i];
+						float r = 2.0f;
+						if ( PointBounceIndex==i ) r += (float)(2-2*bounce);
+						fx.DrawEllipse( pointpen, 20*point.Xf-r, 20*point.Yf-r, 2*r, 2*r );
+					}
 				}
 
 				LineY=10;
-				AddText(fx,"Name: "+Info.Name);
-				AddText(fx,"Triangulation time: "+Info.LastTriangulationDuration.TotalMilliseconds.ToString("N0")+"ms");
-				AddText(fx,"Points: "+Info.Polygon.Points.Count);
-				AddText(fx,"Triangles: "+Info.Polygon.Triangles.Count);
+				AddText(fx, "{0}    Points: {1}    Triangles: {2}"
+					, Info.Name
+					, (Info.Polygon.Points   ==null ? 0 : Info.Polygon.Points.Count)
+					, (Info.Polygon.Triangles==null ? 0 : Info.Polygon.Triangles.Count)
+					);
+				AddText(fx," ");
+
 				AddText(fx,"Memory: "+(GC.GetTotalMemory(false)/1000000).ToString("N0")+"MB");
 				string s = "Collections: ";
 				for ( int i=0, g=GC.MaxGeneration ; i < g ; ++i ) s = s + "    Gen "+i+": "+GC.CollectionCount(i);
 				AddText(fx,s);
+				AddText(fx,"Triangulation time: "+Info.LastTriangulationDuration.TotalMilliseconds.ToString("N0")+"ms");
+				AddText(fx,Info.LastTriangulationException);
 			}
 
 			Invalidate();
