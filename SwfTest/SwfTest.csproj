@@ -43,13 +43,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ExampleData\ExampleData.csproj">
+      <Project>{FC6F045E-7112-44BF-A491-99D987D9C6D2}</Project>
+      <Name>ExampleData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Poly2Tri.csproj">
       <Project>{C5E5802D-6A45-4FE9-BAE7-5F0AE91D72C1}</Project>
       <Name>Poly2Tri</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="nazca_monkey.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
