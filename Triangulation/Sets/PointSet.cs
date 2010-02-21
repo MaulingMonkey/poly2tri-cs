@@ -40,7 +40,7 @@ namespace Poly2Tri {
 			Points = new List<TriangulationPoint>(points);
 		}
 
-		public virtual TriangulationMode TriangulationMode { get { return TriangulationMode.UNCONSTRAINED; }}
+		public virtual TriangulationMode TriangulationMode { get { return TriangulationMode.Unconstrained; }}
 
 		public void AddTriangle(DelaunayTriangle t) {
 			Triangles.Add(t);

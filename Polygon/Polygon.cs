@@ -76,7 +76,7 @@ namespace Poly2Tri {
 		/// <param name="points">A list of unique points.</param>
 		public Polygon( params PolygonPoint[] points ) : this((IList<PolygonPoint>)points) { }
 
-		public TriangulationMode TriangulationMode { get { return TriangulationMode.POLYGON; } }
+		public TriangulationMode TriangulationMode { get { return TriangulationMode.Polygon; } }
 
 		public void AddSteinerPoint( TriangulationPoint point ) {
 			if (_steinerPoints == null) _steinerPoints = new ArrayList<TriangulationPoint>();

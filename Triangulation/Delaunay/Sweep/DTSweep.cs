@@ -77,7 +77,7 @@ namespace Poly2Tri {
 			//        }
 
 			// Finalize triangulation
-			if (tcx.TriangulationMode == TriangulationMode.POLYGON) {
+			if (tcx.TriangulationMode == TriangulationMode.Polygon) {
 				FinalizationPolygon(tcx);
 			} else {
 				FinalizationConvexHull(tcx);
