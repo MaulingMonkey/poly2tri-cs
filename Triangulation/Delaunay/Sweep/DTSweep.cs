@@ -238,18 +238,18 @@ namespace Poly2Tri {
 		private static void EdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			try {
 				tcx.EdgeEvent.ConstrainedEdge = edge;
-				tcx.EdgeEvent.Right = edge.p.X > edge.q.X;
+				tcx.EdgeEvent.Right = edge.P.X > edge.Q.X;
 
 				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().PrimaryTriangle = node.Triangle; }
 
-				if (IsEdgeSideOfTriangle(node.Triangle, edge.p, edge.q)) return;
+				if (IsEdgeSideOfTriangle(node.Triangle, edge.P, edge.Q)) return;
 
 				// For now we will do all needed filling
 				// TODO: integrate with flip process might give some better performance 
 				//       but for now this avoid the issue with cases that needs both flips and fills
 				FillEdgeEvent(tcx, edge, node);
 
-				EdgeEvent(tcx, edge.p, edge.q, node.Triangle, edge.q);
+				EdgeEvent(tcx, edge.P, edge.Q, node.Triangle, edge.Q);
 			} catch ( PointOnEdgeException e) {
 				Debug.WriteLine("Warning: Skipping Edge: {0}", e.Message );
 			}
@@ -265,9 +265,9 @@ namespace Poly2Tri {
 
 		private static void FillRightConcaveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			Fill(tcx, node.Next);
-			if (node.Next.Point != edge.p) {
+			if (node.Next.Point != edge.P) {
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.q, node.Next.Point, edge.p) == Orientation.CCW) {
+				if (TriangulationUtil.orient2d(edge.Q, node.Next.Point, edge.P) == Orientation.CCW) {
 					// Below
 					if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 						// Next is concave
@@ -287,7 +287,7 @@ namespace Poly2Tri {
 			} else {
 				// Convex
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.q, node.Next.Next.Point, edge.p) == Orientation.CCW) {
+				if (TriangulationUtil.orient2d(edge.Q, node.Next.Next.Point, edge.P) == Orientation.CCW) {
 					// Below
 					FillRightConvexEdgeEvent(tcx, edge, node.Next);
 				} else {
@@ -299,7 +299,7 @@ namespace Poly2Tri {
 		private static void FillRightBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
 
-			if (node.Point.X < edge.p.X) { // needed?
+			if (node.Point.X < edge.P.X) { // needed?
 				if (TriangulationUtil.orient2d(node.Point, node.Next.Point, node.Next.Next.Point) == Orientation.CCW) {
 					// Concave 
 					FillRightConcaveEdgeEvent(tcx, edge, node);
@@ -314,10 +314,10 @@ namespace Poly2Tri {
 		}
 
 		private static void FillRightAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			while (node.Next.Point.X < edge.p.X) {
+			while (node.Next.Point.X < edge.P.X) {
 				if (tcx.IsDebugEnabled) { tcx.getDebugContextAsDT().ActiveNode = node; }
 				// Check if next node is below the edge
-				Orientation o1 = TriangulationUtil.orient2d(edge.q, node.Next.Point, edge.p);
+				Orientation o1 = TriangulationUtil.orient2d(edge.Q, node.Next.Point, edge.P);
 				if (o1 == Orientation.CCW) {
 					FillRightBelowEdgeEvent(tcx, edge, node);
 				} else {
@@ -334,7 +334,7 @@ namespace Poly2Tri {
 			} else {
 				// Convex
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.q, node.Prev.Prev.Point, edge.p) == Orientation.CW) {
+				if (TriangulationUtil.orient2d(edge.Q, node.Prev.Prev.Point, edge.P) == Orientation.CW) {
 					// Below
 					FillLeftConvexEdgeEvent(tcx, edge, node.Prev);
 				} else {
@@ -345,9 +345,9 @@ namespace Poly2Tri {
 
 		private static void FillLeftConcaveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			Fill(tcx, node.Prev);
-			if (node.Prev.Point != edge.p) {
+			if (node.Prev.Point != edge.P) {
 				// Next above or below edge?
-				if (TriangulationUtil.orient2d(edge.q, node.Prev.Point, edge.p) == Orientation.CW) {
+				if (TriangulationUtil.orient2d(edge.Q, node.Prev.Point, edge.P) == Orientation.CW) {
 					// Below
 					if (TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
 						// Next is concave
@@ -362,7 +362,7 @@ namespace Poly2Tri {
 		private static void FillLeftBelowEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
 			if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
 
-			if (node.Point.X > edge.p.X) {
+			if (node.Point.X > edge.P.X) {
 				if (TriangulationUtil.orient2d(node.Point, node.Prev.Point, node.Prev.Prev.Point) == Orientation.CW) {
 					// Concave 
 					FillLeftConcaveEdgeEvent(tcx, edge, node);
@@ -377,10 +377,10 @@ namespace Poly2Tri {
 		}
 
 		private static void FillLeftAboveEdgeEvent( DTSweepContext tcx, DTSweepConstraint edge, AdvancingFrontNode node ) {
-			while (node.Prev.Point.X > edge.p.X) {
+			while (node.Prev.Point.X > edge.P.X) {
 				if (tcx.IsDebugEnabled) tcx.getDebugContextAsDT().ActiveNode = node;
 				// Check if next node is below the edge
-				Orientation o1 = TriangulationUtil.orient2d(edge.q, node.Prev.Point, edge.p);
+				Orientation o1 = TriangulationUtil.orient2d(edge.Q, node.Prev.Point, edge.P);
 				if (o1 == Orientation.CW) {
 					FillLeftBelowEdgeEvent(tcx, edge, node);
 				} else {
@@ -457,7 +457,7 @@ namespace Poly2Tri {
 		/// <param name="p">point on the edge between ep->eq</param>
 		private static void SplitEdge( TriangulationPoint ep, TriangulationPoint eq, TriangulationPoint p ) {
 			DTSweepConstraint edge = eq.getEdge(ep);
-			edge.p = p;
+			edge.P = p;
 			new DTSweepConstraint(ep, p); // Et tu, Brute? --MM
 
 			//        // Redo this edge now that we have split the constraint
@@ -489,8 +489,8 @@ namespace Poly2Tri {
 				tcx.MapTriangleToNodes(ot);
 
 				if (p == eq && op == ep) {
-					if (eq == tcx.EdgeEvent.ConstrainedEdge.q
-						&& ep == tcx.EdgeEvent.ConstrainedEdge.p) {
+					if (eq == tcx.EdgeEvent.ConstrainedEdge.Q
+						&& ep == tcx.EdgeEvent.ConstrainedEdge.P) {
 						if (tcx.IsDebugEnabled) Console.WriteLine("[FLIP] - constrained edge done"); // TODO: remove
 						t.MarkConstrainedEdge(ep, eq);
 						ot.MarkConstrainedEdge(ep, eq);

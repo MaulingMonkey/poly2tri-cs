@@ -62,7 +62,7 @@
     <Compile Include="Triangulation\Orientation.cs" />
     <Compile Include="Triangulation\Sets\ConstrainedPointSet.cs" />
     <Compile Include="Triangulation\Sets\PointSet.cs" />
-    <Compile Include="Triangulation\Triangulatable.cs" />
+    <Compile Include="Triangulation\ITriangulatable.cs" />
     <Compile Include="Triangulation\TriangulationAlgorithm.cs" />
     <Compile Include="Triangulation\TriangulationConstraint.cs" />
     <Compile Include="Triangulation\TriangulationContext.cs" />

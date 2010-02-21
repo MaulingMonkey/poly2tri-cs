@@ -38,15 +38,7 @@
 
 namespace Poly2Tri {
 	public class TriangulationConstraint {
-		public TriangulationPoint p;
-		public TriangulationPoint q;
-
-		public TriangulationPoint getP() {
-			return p;
-		}
-
-		public TriangulationPoint getQ() {
-			return q;
-		}
+		public TriangulationPoint P;
+		public TriangulationPoint Q;
 	}
 }

@@ -154,7 +154,7 @@ namespace Poly2Tri {
 		}
 
 		public void MarkConstrainedEdge(DTSweepConstraint edge) {
-			MarkConstrainedEdge(edge.p, edge.q);
+			MarkConstrainedEdge(edge.P, edge.Q);
 		}
 
 		/// <summary>

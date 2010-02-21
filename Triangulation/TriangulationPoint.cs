@@ -65,7 +65,7 @@ namespace Poly2Tri {
 		 */
 		public DTSweepConstraint getEdge(TriangulationPoint p) {
 			foreach (DTSweepConstraint c in edges) {
-				if (c.p == p) {
+				if (c.P == p) {
 					return c;
 				}
 			}
