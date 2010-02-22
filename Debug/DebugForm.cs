@@ -35,6 +35,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
+using System.Drawing.Imaging;
 
 namespace Poly2Tri {
 	[System.ComponentModel.DesignerCategory("")] class DebugForm : Form {
@@ -111,7 +112,14 @@ namespace Poly2Tri {
 			}
 		}
 
+		static int FrameI=0;
+
+		Bitmap FrameCache;
+		DateTime PreviousFrame = DateTime.Now;
+		Action<Bitmap> EachFrame; // = (b) => { b.Save(string.Format(@"C:\frames\{0}.png",FrameI++),ImageFormat.Png); };
 		protected override void OnPaint( PaintEventArgs e ) {
+			var now = (EachFrame==null) ? DateTime.Now : PreviousFrame.AddSeconds(1.0/60); // change logical framerate to 60fps if frame capturing
+
 			var fx = e.Graphics;
 			fx.Clear( BackColor );
 
@@ -130,8 +138,6 @@ namespace Poly2Tri {
 					pen.StartCap = pen.EndCap = LineCap.Round;
 					pen.LineJoin = LineJoin.Round;
 				}
-
-				var now = DateTime.Now;
 
 				Info.Triangulate();
 
@@ -215,6 +221,22 @@ namespace Poly2Tri {
 				float size = Math.Min( 256.0f, Math.Min( ClientSize.Width, ClientSize.Height )/8.0f );
 				float pad = 10.0f;
 				fx.DrawImage( ExampleData.Logo256x256, ClientSize.Width-size-pad, pad, size, size );
+			}
+
+			if ( EachFrame==null ) {
+				PreviousFrame = now;
+			} else if ( PreviousFrame < now ) {
+				if ( FrameCache == null || FrameCache.Size != Size ) {
+					using ( FrameCache ) {}
+					FrameCache = new Bitmap( Size.Width, Size.Height, PixelFormat.Format24bppRgb );
+				}
+
+				using ( var g = Graphics.FromImage(FrameCache) ) g.CopyFromScreen( Location, Point.Empty, Size );
+
+				while ( PreviousFrame < now ) {
+					EachFrame(FrameCache);
+					PreviousFrame = PreviousFrame.AddSeconds(1.0/60);
+				}
 			}
 
 			Invalidate();
