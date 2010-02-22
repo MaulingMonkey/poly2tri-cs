@@ -115,6 +115,7 @@ namespace Poly2Tri {
 			var fx = e.Graphics;
 			fx.Clear( BackColor );
 
+			var framestart = DateTime.Now;
 			if ( Info == null ) {
 				TextRenderer.DrawText( fx, "No polygon selected.", Font, ClientRectangle, ForeColor, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter );
 			}
@@ -189,6 +190,8 @@ namespace Poly2Tri {
 					foreach ( var p in line ) fx.DrawEllipse( poeepen, p.X-2, p.Y-2, 4, 4 );
 				}
 
+				var polyrenderend = DateTime.Now; // not counting all the text processing
+				fx.ResetTransform();
 				LineY=10;
 				AddText(fx, "{0}    Points: {1}    Triangles: {2}"
 					, Info.Name
@@ -198,11 +201,20 @@ namespace Poly2Tri {
 				AddText(fx," ");
 
 				AddText(fx,"Memory: "+(GC.GetTotalMemory(false)/1000000).ToString("N0")+"MB");
-				string s = "Collections: ";
-				for ( int i=0, g=GC.MaxGeneration ; i < g ; ++i ) s = s + "    Gen "+i+": "+GC.CollectionCount(i);
+				string s = "Collections    ";
+				for ( int i=0, g=GC.MaxGeneration ; i < g ; ++i ) s = s + "    Gen"+i+": "+GC.CollectionCount(i);
 				AddText(fx,s);
-				AddText(fx,"Triangulation time: "+Info.LastTriangulationDuration.TotalMilliseconds.ToString("N0")+"ms");
+
+				AddText(fx,"Time    Triangulation: {0}ms    Render: {1}ms"
+					, Info.LastTriangulationDuration.TotalMilliseconds.ToString("N0")
+					, (polyrenderend-framestart).TotalMilliseconds.ToString("N0")
+					);
 				AddText(fx,Info.LastTriangulationException);
+				
+				fx.InterpolationMode = InterpolationMode.High;
+				float size = Math.Min( 256.0f, Math.Min( ClientSize.Width, ClientSize.Height )/8.0f );
+				float pad = 10.0f;
+				fx.DrawImage( ExampleData.Logo256x256, ClientSize.Width-size-pad, pad, size, size );
 			}
 
 			Invalidate();
