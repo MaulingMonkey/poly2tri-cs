@@ -40,21 +40,21 @@ using System.Drawing.Imaging;
 namespace Poly2Tri {
 	[System.ComponentModel.DesignerCategory("")] class DebugForm : Form {
 		List<PolygonInfo> Infos = new List<PolygonInfo>()
-			{ new PolygonInfo( "Two", new Polygon(ExampleData.Two ))
-			, new PolygonInfo( "Bird", new Polygon(ExampleData.Bird ))
-			, new PolygonInfo( "Custom", new Polygon(ExampleData.Custom ))
-			, new PolygonInfo( "Debug", new Polygon(ExampleData.Debug ))
-			, new PolygonInfo( "Debug2", new Polygon(ExampleData.Debug2 ))
-			, new PolygonInfo( "Diamond", new Polygon(ExampleData.Diamond ))
-			, new PolygonInfo( "Dude", new Polygon(ExampleData.Dude ))
-			, new PolygonInfo( "Funny", new Polygon(ExampleData.Funny ))
-			, new PolygonInfo( "NazcaHeron", new Polygon(ExampleData.NazcaHeron ))
-			, new PolygonInfo( "NazcaMonkey", new Polygon(ExampleData.NazcaMonkey ))
-			, new PolygonInfo( "Sketchup", new Polygon(ExampleData.Sketchup ))
-			, new PolygonInfo( "Star", new Polygon(ExampleData.Star ))
-			, new PolygonInfo( "Strange", new Polygon(ExampleData.Strange ))
-			, new PolygonInfo( "Tank", new Polygon(ExampleData.Tank ))
-			, new PolygonInfo( "Test", new Polygon(ExampleData.Test ))
+			{ new PolygonInfo( "Two", (ExampleData.Two ))
+			, new PolygonInfo( "Bird", (ExampleData.Bird ))
+			, new PolygonInfo( "Custom", (ExampleData.Custom ))
+			, new PolygonInfo( "Debug", (ExampleData.Debug ))
+			, new PolygonInfo( "Debug2", (ExampleData.Debug2 ))
+			, new PolygonInfo( "Diamond", (ExampleData.Diamond ))
+			, new PolygonInfo( "Dude", (ExampleData.Dude ))
+			, new PolygonInfo( "Funny", (ExampleData.Funny ))
+			, new PolygonInfo( "NazcaHeron", (ExampleData.NazcaHeron ))
+			, new PolygonInfo( "NazcaMonkey", (ExampleData.NazcaMonkey ))
+			, new PolygonInfo( "Sketchup", (ExampleData.Sketchup ))
+			, new PolygonInfo( "Star", (ExampleData.Star ))
+			, new PolygonInfo( "Strange", (ExampleData.Strange ))
+			, new PolygonInfo( "Tank", (ExampleData.Tank ))
+			, new PolygonInfo( "Test", (ExampleData.Test ))
 			};
 
 		int InfoI = 0;
@@ -124,17 +124,20 @@ namespace Poly2Tri {
 			fx.Clear( BackColor );
 
 			var framestart = DateTime.Now;
-			if ( Info == null ) {
+
+			if ( Info == null )
+			{
 				TextRenderer.DrawText( fx, "No polygon selected.", Font, ClientRectangle, ForeColor, Color.Transparent, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter );
 			}
 			else
-			using ( var pointpen = new Pen( Color.White, 1.0f ) )
-			using ( var outlinepen = new Pen( Color.Blue, 3.0f ) )
-			using ( var tripen = new Pen( Color.Green, 1.0f ) )
-			using ( var poeepen = new Pen( Color.Red, 10.0f ) )
-			using ( var boblinepen = new Pen( Color.Blue, 10.0f ) )
+			using ( var pointpen   = new Pen( Color.White,  1.0f ) )
+			using ( var outlinepen = new Pen( Color.Blue ,  3.0f ) )
+			using ( var holepen    = new Pen( Color.Red  ,  3.0f ) )
+			using ( var tripen     = new Pen( Color.Green,  1.0f ) )
+			using ( var poeepen    = new Pen( Color.Red  , 10.0f ) )
+			using ( var boblinepen = new Pen( Color.Blue , 10.0f ) )
 			{
-				foreach ( var pen in new[] { pointpen, outlinepen, tripen, poeepen, boblinepen } ) {
+				foreach ( var pen in new[] { pointpen, outlinepen, holepen, tripen, poeepen, boblinepen } ) {
 					pen.StartCap = pen.EndCap = LineCap.Round;
 					pen.LineJoin = LineJoin.Round;
 				}
@@ -170,6 +173,9 @@ namespace Poly2Tri {
 				if ( Info.Polygon.Points != null ) {
 					PointBounceIndex %= Info.Polygon.Points.Count;
 					fx.DrawPolygon( outlinepen, Info.Polygon.Points.Select(f).ToArray() );
+
+					if ( Info.Polygon.Holes != null ) foreach ( var hole in Info.Polygon.Holes ) fx.DrawPolygon( holepen, hole.Points.Select(f).ToArray() );
+
 					boblinepen.Width = 3.0f + 9-9*bounce;
 					fx.DrawLine( boblinepen, f(Info.Polygon.Points[(PointBounceIndex+Info.Polygon.Points.Count-1)%Info.Polygon.Points.Count]), f(Info.Polygon.Points[PointBounceIndex]) );
 				}
@@ -181,8 +187,10 @@ namespace Poly2Tri {
 				}
 
 				if ( Info.Polygon.Points != null ) {
-					for ( int i = 0 ; i < Info.Polygon.Points.Count ; ++i ) {
-						var point = f(Info.Polygon.Points[i]);
+					foreach ( var poly in new[]{Info.Polygon}.Concat(Info.Polygon.Holes ?? new Polygon[]{}) )
+					for ( int i = 0 ; i < poly.Points.Count ; ++i )
+					{
+						var point = f(poly.Points[i]);
 						float r = 2.0f;
 						if ( PointBounceIndex==i ) r += 2-2*bounce;
 						fx.DrawEllipse( pointpen, point.X-r, point.Y-r, 2*r, 2*r );

@@ -50,7 +50,7 @@ namespace SwfTest {
 			Text = "Just a test";
 			Visible = true;
 
-			Polygons = new List<Polygon>( ExampleData.Polygons.Select( data => new Polygon(data) ) );
+			Polygons = ExampleData.Polygons.ToList();
 			foreach ( var poly in Polygons ) try {
 				P2T.Triangulate(poly);
 			} catch ( Exception ) {}
