@@ -33,6 +33,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Globalization;
 
 namespace Poly2Tri {
 	public static class ExampleData {
@@ -42,7 +43,7 @@ namespace Poly2Tri {
 				string line = line_.Trim();
 				if ( string.IsNullOrEmpty(line) ) continue;
 				var xy = line.Split( new[]{' ',','}, StringSplitOptions.RemoveEmptyEntries );
-				points.Add( new PolygonPoint( (xflip?-1:+1) * double.Parse(xy[0]), (yflip?-1:+1) * double.Parse(xy[1]) ) );
+				points.Add( new PolygonPoint( (xflip?-1:+1) * double.Parse(xy[0],CultureInfo.InvariantCulture), (yflip?-1:+1) * double.Parse(xy[1],CultureInfo.InvariantCulture) ) );
 			}
 			return new Polygon(points);
 		}
