@@ -121,7 +121,22 @@ namespace Poly2Tri {
 			n3 = n2.Next;
 			first = n1.Point;
 
-			TurnAdvancingFrontConvex(tcx, n2, n3);
+			TurnAdvancingFrontConvex(tcx, n1, n2);
+
+			n1 = tcx.Front.Tail.Prev;
+			if (n1.Triangle.Contains(n1.Next.Point) && n1.Triangle.Contains(n1.Prev.Point)) {
+				t1 = n1.Triangle.NeighborAcrossFrom(n1.Point);
+				RotateTrianglePair(n1.Triangle, n1.Point, t1, t1.OppositePoint(n1.Triangle, n1.Point));
+				tcx.MapTriangleToNodes(n1.Triangle);
+				tcx.MapTriangleToNodes(t1);
+			}
+			n1 = tcx.Front.Head.Next;
+			if (n1.Triangle.Contains(n1.Prev.Point) && n1.Triangle.Contains(n1.Next.Point)) {
+				t1 = n1.Triangle.NeighborAcrossFrom(n1.Point);
+				RotateTrianglePair(n1.Triangle, n1.Point, t1, t1.OppositePoint(n1.Triangle, n1.Point));
+				tcx.MapTriangleToNodes(n1.Triangle);
+				tcx.MapTriangleToNodes(t1);
+			}
 
 			// TODO: implement ConvexHull for lower right and left boundary
 			// Lower right boundary 
