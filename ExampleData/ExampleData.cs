@@ -67,15 +67,15 @@ namespace Poly2Tri {
 		}
 
 		// These should all use +x = right, +y = up
-		public static Polygon Two         { get { return CacheLoadDat(@"Data\2.dat"); } }
-		public static Polygon Bird        { get { return CacheLoadDat(@"Data\bird.dat",false,true); } }
-		public static Polygon Custom      { get { return CacheLoadDat(@"Data\custom.dat"); } }
-		public static Polygon Debug       { get { return CacheLoadDat(@"Data\debug.dat"); } }
-		public static Polygon Debug2      { get { return CacheLoadDat(@"Data\debug2.dat"); } }
-		public static Polygon Diamond     { get { return CacheLoadDat(@"Data\diamond.dat"); } }
+		public static Polygon Two         { get { return CacheLoadDat(@"Data/2.dat"); } }
+		public static Polygon Bird        { get { return CacheLoadDat(@"Data/bird.dat",false,true); } }
+		public static Polygon Custom      { get { return CacheLoadDat(@"Data/custom.dat"); } }
+		public static Polygon Debug       { get { return CacheLoadDat(@"Data/debug.dat"); } }
+		public static Polygon Debug2      { get { return CacheLoadDat(@"Data/debug2.dat"); } }
+		public static Polygon Diamond     { get { return CacheLoadDat(@"Data/diamond.dat"); } }
 		public static Polygon Dude        { get {
-			if (!ImageCache.ContainsKey(@"Data\dude.dat")) {
-				var p = CacheLoadDat(@"Data\dude.dat");
+			if (!ImageCache.ContainsKey(@"Data/dude.dat")) {
+				var p = CacheLoadDat(@"Data/dude.dat");
 				p.AddHole( new Polygon
 					( new PolygonPoint(325,437)
 					, new PolygonPoint(320,423)
@@ -93,17 +93,17 @@ namespace Poly2Tri {
 			}
 			return CacheLoadDat(@"Data\dude.dat");
 		}}
-		public static Polygon Funny       { get { return CacheLoadDat(@"Data\funny.dat"); } }
-		public static Polygon NazcaHeron  { get { return CacheLoadDat(@"Data\nazca_heron.dat"); } }
-		public static Polygon NazcaMonkey { get { return CacheLoadDat(@"Data\nazca_monkey.dat",false,true); } }
-		public static Polygon Sketchup    { get { return CacheLoadDat(@"Data\sketchup.dat"); } }
-		public static Polygon Star        { get { return CacheLoadDat(@"Data\star.dat"); } }
-		public static Polygon Strange     { get { return CacheLoadDat(@"Data\strange.dat"); } }
-		public static Polygon Tank        { get { return CacheLoadDat(@"Data\tank.dat"); } }
-		public static Polygon Test        { get { return CacheLoadDat(@"Data\test.dat"); } }
+		public static Polygon Funny       { get { return CacheLoadDat(@"Data/funny.dat"); } }
+		public static Polygon NazcaHeron  { get { return CacheLoadDat(@"Data/nazca_heron.dat"); } }
+		public static Polygon NazcaMonkey { get { return CacheLoadDat(@"Data/nazca_monkey.dat",false,true); } }
+		public static Polygon Sketchup    { get { return CacheLoadDat(@"Data/sketchup.dat"); } }
+		public static Polygon Star        { get { return CacheLoadDat(@"Data/star.dat"); } }
+		public static Polygon Strange     { get { return CacheLoadDat(@"Data/strange.dat"); } }
+		public static Polygon Tank        { get { return CacheLoadDat(@"Data/tank.dat"); } }
+		public static Polygon Test        { get { return CacheLoadDat(@"Data/test.dat"); } }
 
 		public static IEnumerable<Polygon> Polygons { get { return new[] { Two, Bird, Custom, Debug, Debug2, Diamond, Dude, Funny, NazcaHeron, NazcaMonkey, Sketchup, Star, Strange, Tank, Test }; }}
 
-		public static Image Logo256x256 { get { return CacheLoadImage(@"Textures\poly2tri_logotype_256x256.png"); } }
+		public static Image Logo256x256 { get { return CacheLoadImage(@"Textures/poly2tri_logotype_256x256.png"); } }
 	}
 }
