@@ -157,6 +157,12 @@ namespace Poly2Tri {
 			t1 = t1.NeighborCWFrom(tcx.Front.Head.Point);
 			do {
 				tcx.RemoveFromList(t1);
+                // NOTE: there was a NullReferenceException
+                // probably t1 was null
+                if (t1 == null)
+                {
+                    break; // TODO: is this solution OK?
+                }
 				p1 = t1.PointCCWFrom(p1);
 				t1 = t1.NeighborCCWFrom(p1);
 			} while (p1 != first);
@@ -195,7 +201,21 @@ namespace Poly2Tri {
 			// Get an Internal triangle to start with
 			DelaunayTriangle t = tcx.Front.Head.Next.Triangle;
 			TriangulationPoint p = tcx.Front.Head.Next.Point;
-			while (!t.GetConstrainedEdgeCW(p)) t = t.NeighborCCWFrom(p);
+            while (!t.GetConstrainedEdgeCW(p))
+            {
+                DelaunayTriangle nextTriangle = t.NeighborCCWFrom(p);
+                // NOTE: there was a NullReferenceException
+                // probably t was null
+                // TODO: is this solution ok?
+                if (nextTriangle != null)
+                {
+                    t = nextTriangle;
+                }
+                else
+                {
+                    break;
+                }
+            }
 
 			// Collect interior triangles constrained by edges
 			tcx.MeshClean(t);
